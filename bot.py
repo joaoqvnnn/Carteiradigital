@@ -22,7 +22,8 @@ from database import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.Markdown))
+# AQUI ESTAVA O ERRO: ParseMode.MARKDOWN em maiúsculo
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
 dp = Dispatcher()
 
 # ==================== LOCKS / RATE LIMIT ====================
