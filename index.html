@@ -59,19 +59,17 @@ body {
 }
 
 /* ============================================================
-   ANIMAÇÕES (Framer Motion Style)
+   ANIMAÇÕES
    ============================================================ */
 .fade-in { animation: fadeIn 0.4s ease-out forwards; }
 .slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .slide-out { animation: slideOut 0.3s ease-in forwards; }
 .pop-in { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.pulse { animation: pulse 2s infinite; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
 @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes drawCheck { to { stroke-dashoffset: 0; } }
 
@@ -128,26 +126,29 @@ body {
 .input-wrapper {
   position: relative; display: flex; align-items: center;
 }
-.input-wrapper svg {
+.input-wrapper svg.ico {
   position: absolute; left: 16px; width: 20px; height: 20px; color: var(--text-mute);
   pointer-events: none; transition: var(--transition);
 }
 .input-wrapper input, .input-wrapper select {
-  width: 100%; padding: 16px 16px 16px 48px;
+  width: 100%; padding: 16px;
   border: 1.5px solid var(--border); border-radius: var(--radius);
   font-size: 16px; color: var(--text); background: var(--surface);
   transition: var(--transition); outline: none;
   font-family: 'Inter', sans-serif; font-weight: 500;
   appearance: none;
 }
+/* Quando tem ícone, adiciona padding extra na esquerda */
+.input-wrapper.has-icon input, .input-wrapper.has-icon select {
+  padding-left: 48px;
+}
 .input-wrapper input::placeholder { color: var(--text-mute); font-weight: 400; }
 .input-wrapper input:focus, .input-wrapper select:focus {
   border-color: var(--blue-500);
   box-shadow: 0 0 0 4px rgba(30, 98, 240, 0.1);
 }
-.input-wrapper input:focus + svg { color: var(--blue-500); }
+.input-wrapper input:focus + svg.ico { color: var(--blue-500); }
 .input-wrapper.error input { border-color: var(--danger); }
-.input-wrapper.error + .error-msg { display: block; }
 .error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
 
 .row { display: flex; gap: 12px; }
@@ -184,33 +185,47 @@ body {
 .welcome-subtitle { font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 48px; line-height: 1.5; }
 .welcome-actions { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
 .welcome-actions .btn-primary { background: white; color: var(--navy-700); }
-.welcome-actions .btn-primary:hover { background: #f0f0f0; }
 .welcome-actions .btn-outline { border-color: rgba(255,255,255,0.3); color: white; }
-.welcome-actions .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
-/* OTP */
-.otp-container { display: flex; gap: 8px; justify-content: center; margin: 24px 0; }
-.otp-input {
-  width: 48px; height: 56px; text-align: center; font-size: 24px; font-weight: 700;
-  border: 1.5px solid var(--border); border-radius: var(--radius);
-  background: var(--bg); color: var(--text);
-}
-.otp-input:focus { border-color: var(--blue-500); background: white; outline: none; }
-
-/* Uploads */
+/* Uploads simulados */
 .upload-box {
   border: 2px dashed var(--border); border-radius: var(--radius-lg);
   padding: 32px 16px; text-align: center; cursor: pointer;
   transition: var(--transition); background: var(--bg);
   display: flex; flex-direction: column; align-items: center; gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 16px; position: relative; overflow: hidden;
 }
-.upload-box:hover { border-color: var(--blue-500); background: var(--blue-100); }
-.upload-box svg { width: 32px; height: 32px; color: var(--blue-500); }
-.upload-box span { font-size: 14px; font-weight: 600; color: var(--text); }
+.upload-box:active { border-color: var(--blue-500); background: var(--blue-100); }
+.upload-box svg.upload-icon { width: 32px; height: 32px; color: var(--blue-500); }
+.upload-box span.upload-title { font-size: 14px; font-weight: 600; color: var(--text); }
 .upload-box small { font-size: 12px; color: var(--text-dim); }
 .upload-box input[type="file"] { display: none; }
-.upload-preview { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius); display: none; margin-top: 12px; }
+.upload-preview { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius); display: none; margin-top: 12px; z-index: 2; }
+
+/* Estado de Loading no Upload */
+.upload-box.loading { border-color: var(--blue-500); background: var(--blue-100); pointer-events: none; }
+.upload-box.loading .upload-icon, .upload-box.loading .upload-title, .upload-box.loading small, .upload-box.loading .upload-preview { opacity: 0; }
+.upload-box.loading::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 32px; height: 32px; margin: -16px 0 0 -16px;
+  border: 3px solid var(--blue-500); border-top-color: transparent;
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+.upload-box.loading::before {
+  content: 'Analisando documento...'; position: absolute;
+  bottom: 24px; left: 0; width: 100%; text-align: center;
+  font-size: 12px; font-weight: 600; color: var(--blue-500);
+}
+
+/* Estado de Sucesso no Upload */
+.upload-box.success { border-color: var(--success); border-style: solid; background: rgba(18,183,106,0.05); pointer-events: none; }
+.upload-box.success .upload-icon { color: var(--success); }
+.upload-box.success::before {
+  content: 'Documento verificado!'; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 14px; font-weight: 700; color: var(--success); z-index: 3;
+  background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 8px;
+}
 
 /* Câmera / Selfie */
 .camera-sim {
@@ -222,6 +237,12 @@ body {
   width: 65%; aspect-ratio: 3/4; border: 3px solid rgba(255,255,255,0.5);
   border-radius: 50%; position: absolute; top: 15%;
   box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+}
+.camera-sim.loading::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 40px; height: 40px; margin: -20px 0 0 -20px;
+  border: 4px solid var(--blue-500); border-top-color: transparent;
+  border-radius: 50%; animation: spin 1s linear infinite; z-index: 20;
 }
 
 /* Medidor de senha */
@@ -268,7 +289,7 @@ body {
     </p>
   </div>
 
-  <!-- HEADER (Aparece durante o onboarding) -->
+  <!-- HEADER -->
   <div class="header hidden" id="app-header">
     <button class="btn-back" onclick="prevStep()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -276,7 +297,7 @@ body {
     <div class="progress-container">
       <div class="progress-text">
         <span id="step-name">Dados Pessoais</span>
-        <span id="step-counter">Passo 1 de 6</span>
+        <span id="step-counter">Passo 1 de 7</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill"></div>
@@ -285,9 +306,7 @@ body {
   </div>
 
   <!-- CONTEÚDO DINÂMICO -->
-  <div class="content hidden" id="app-content">
-    <!-- O JS injeta o HTML dos formulários aqui -->
-  </div>
+  <div class="content hidden" id="app-content"></div>
 </div>
 
 <script>
@@ -298,9 +317,9 @@ const state = {
   step: 0,
   data: {
     name: '', cpf: '', birthdate: '', nationality: 'Brasileira', country: 'Brasil',
-    email: '', phone: '', ddd: '',
+    email: '', phone: '',
     cep: '', address: '', addressNum: '', addressComp: '', neighborhood: '', city: '', uf: '',
-    docType: '', docFront: null, docBack: null,
+    docType: '', docFront: false, docBack: false,
     selfie: false,
     password: '',
     terms: false
@@ -312,7 +331,7 @@ const stepsConfig = [
   { id: 'contact', name: 'Contatos' },
   { id: 'address', name: 'Endereço' },
   { id: 'document', name: 'Documentos' },
-  { id: 'selfie', name: 'Reconhecimento Facial' },
+  { id: 'selfie', name: 'Reconhecimento' },
   { id: 'password', name: 'Segurança' },
   { id: 'review', name: 'Revisão' }
 ];
@@ -359,13 +378,12 @@ function nextStep() {
 }
 
 /* ============================================================
-   RENDERIZAÇÃO DAS TELAS (ETAPAS)
+   RENDERIZAÇÃO DAS TELAS
    ============================================================ */
 function renderStep() {
   updateHeader();
   const container = document.getElementById('app-content');
   
-  // Animação de saída
   container.classList.remove('slide-in');
   container.classList.add('slide-out');
   
@@ -381,7 +399,6 @@ function renderStep() {
     if (config.id === 'password') renderPassword(container);
     if (config.id === 'review') renderReview(container);
 
-    // Animação de entrada
     container.classList.remove('slide-out');
     container.classList.add('slide-in');
     container.scrollTop = 0;
@@ -398,8 +415,8 @@ function renderPersonal(c) {
     
     <div class="input-group">
       <label>Nome completo</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <input type="text" id="inp-name" placeholder="Ex: João da Silva" value="${state.data.name}" oninput="state.data.name = this.value">
       </div>
       <div class="error-msg" id="err-name">Informe seu nome completo.</div>
@@ -407,8 +424,8 @@ function renderPersonal(c) {
 
     <div class="input-group">
       <label>CPF</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h5"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h5"/></svg>
         <input type="tel" id="inp-cpf" placeholder="000.000.000-00" maxlength="14" value="${state.data.cpf}" oninput="maskCPF(this)">
       </div>
       <div class="error-msg" id="err-cpf">CPF inválido.</div>
@@ -416,8 +433,8 @@ function renderPersonal(c) {
 
     <div class="input-group">
       <label>Data de nascimento</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         <input type="date" id="inp-birth" value="${state.data.birthdate}" onchange="state.data.birthdate = this.value">
       </div>
       <div class="error-msg" id="err-birth">Você precisa ter 18 anos ou mais.</div>
@@ -430,12 +447,11 @@ function renderPersonal(c) {
           <select onchange="state.data.nationality = this.value">
             <option value="Brasileira" ${state.data.nationality === 'Brasileira' ? 'selected' : ''}>Brasileira</option>
             <option value="Portuguesa">Portuguesa</option>
-            <option value="Outra">Outra</option>
           </select>
         </div>
       </div>
       <div class="input-group">
-        <label>País de residência</label>
+        <label>País</label>
         <div class="input-wrapper">
           <select onchange="state.data.country = this.value">
             <option value="Brasil" ${state.data.country === 'Brasil' ? 'selected' : ''}>Brasil</option>
@@ -460,7 +476,7 @@ function maskCPF(input) {
 }
 
 /* ============================================================
-   ETAPA 2: CONTATOS E OTP
+   ETAPA 2: CONTATOS (TELEFONE CORRIGIDO)
    ============================================================ */
 function renderContact(c) {
   c.innerHTML = `
@@ -469,28 +485,20 @@ function renderContact(c) {
     
     <div class="input-group">
       <label>E-mail</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         <input type="email" id="inp-email" placeholder="voce@email.com" value="${state.data.email}" oninput="state.data.email = this.value">
       </div>
       <div class="error-msg" id="err-email">Digite um e-mail válido.</div>
     </div>
 
-    <div class="row">
-      <div class="input-group" style="flex: 0.4;">
-        <label>DDD</label>
-        <div class="input-wrapper">
-          <input type="tel" id="inp-ddd" placeholder="11" maxlength="2" value="${state.data.ddd}" oninput="state.data.ddd = this.value">
-        </div>
+    <div class="input-group">
+      <label>Celular</label>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+        <input type="tel" id="inp-phone" placeholder="(11) 99999-9999" maxlength="15" value="${state.data.phone}" oninput="maskPhone(this)">
       </div>
-      <div class="input-group" style="flex: 1.6;">
-        <label>Celular</label>
-        <div class="input-wrapper">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
-          <input type="tel" id="inp-phone" placeholder="99999-9999" maxlength="10" value="${state.data.phone}" oninput="maskPhone(this)">
-        </div>
-        <div class="error-msg" id="err-phone">Celular inválido.</div>
-      </div>
+      <div class="error-msg" id="err-phone">Celular inválido. Digite DDD + número.</div>
     </div>
 
     <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
@@ -500,13 +508,23 @@ function renderContact(c) {
 function maskPhone(input) {
   let v = input.value.replace(/\D/g, '');
   if (v.length > 11) v = v.slice(0, 11);
-  v = v.replace(/(\d{5})(\d)/, '$1-$2');
+  
+  if (v.length > 10) {
+    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+  } else if (v.length > 6) {
+    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+  } else if (v.length > 2) {
+    v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+  } else if (v.length > 0) {
+    v = v.replace(/^(\d*)/, '($1');
+  }
+  
   input.value = v;
   state.data.phone = v;
 }
 
 /* ============================================================
-   ETAPA 3: ENDEREÇO (VIA CEP API REAL)
+   ETAPA 3: ENDEREÇO (VIA CEP)
    ============================================================ */
 function renderAddress(c) {
   c.innerHTML = `
@@ -515,8 +533,8 @@ function renderAddress(c) {
     
     <div class="input-group">
       <label>CEP</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <input type="tel" id="inp-cep" placeholder="00000-000" maxlength="9" value="${state.data.cep}" oninput="maskCEP(this)" onblur="fetchCEP()">
       </div>
       <div class="error-msg" id="err-cep">CEP inválido.</div>
@@ -553,13 +571,13 @@ function renderAddress(c) {
     </div>
 
     <div class="row">
-      <div class="input-group">
+      <div class="input-group" style="flex: 2;">
         <label>Cidade</label>
         <div class="input-wrapper">
           <input type="text" id="inp-city" placeholder="São Paulo" value="${state.data.city}" oninput="state.data.city = this.value">
         </div>
       </div>
-      <div class="input-group" style="flex: 0.4;">
+      <div class="input-group" style="flex: 1;">
         <label>UF</label>
         <div class="input-wrapper">
           <input type="text" id="inp-uf" placeholder="SP" maxlength="2" value="${state.data.uf}" oninput="state.data.uf = this.value">
@@ -608,7 +626,7 @@ async function fetchCEP() {
 }
 
 /* ============================================================
-   ETAPA 4: DOCUMENTOS
+   ETAPA 4: DOCUMENTOS (SIMULAÇÃO DE ANÁLISE OCR)
    ============================================================ */
 function renderDocument(c) {
   c.innerHTML = `
@@ -618,53 +636,74 @@ function renderDocument(c) {
     <div class="input-group">
       <label>Tipo de documento</label>
       <div class="input-wrapper">
-        <select onchange="state.data.docType = this.value">
+        <select id="sel-docType" onchange="state.data.docType = this.value">
           <option value="">Selecione...</option>
           <option value="RG">RG</option>
           <option value="CNH">CNH</option>
         </select>
       </div>
+      <div class="error-msg" id="err-doctype">Selecione o tipo de documento.</div>
     </div>
 
-    <label class="upload-box" onclick="document.getElementById('file-front').click()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span>Frente do documento</span>
+    <div class="upload-box" id="box-front" onclick="triggerUpload('front')">
+      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span class="upload-title">Frente do documento</span>
       <small>Tire uma foto nítida, sem reflexos.</small>
-      <input type="file" id="file-front" accept="image/*" capture="environment" onchange="handleUpload(this, 'docFront', 'preview-front')">
       <img id="preview-front" class="upload-preview" src="" alt="Frente">
-    </label>
+      <input type="file" id="file-front" accept="image/*" onchange="simulateUpload(this, 'front')">
+    </div>
 
-    <label class="upload-box" onclick="document.getElementById('file-back').click()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span>Verso do documento</span>
+    <div class="upload-box" id="box-back" onclick="triggerUpload('back')">
+      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span class="upload-title">Verso do documento</span>
       <small>Necessário para alguns documentos.</small>
-      <input type="file" id="file-back" accept="image/*" capture="environment" onchange="handleUpload(this, 'docBack', 'preview-back')">
       <img id="preview-back" class="upload-preview" src="" alt="Verso">
-    </label>
+      <input type="file" id="file-back" accept="image/*" onchange="simulateUpload(this, 'back')">
+    </div>
 
     <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
   `;
 }
 
-function handleUpload(input, dataKey, previewId) {
+function triggerUpload(side) {
+  // Se já foi enviado, não faz nada
+  if (state.data[side === 'front' ? 'docFront' : 'docBack'] === 'success') return;
+  document.getElementById(`file-${side}`).click();
+}
+
+function simulateUpload(input, side) {
+  const box = document.getElementById(`box-${side}`);
+  const preview = document.getElementById(`preview-${side}`);
   const file = input.files[0];
-  if (file) {
+
+  // Se o usuário cancelar a câmera, não faz nada
+  if (!file) return;
+
+  // Mostra preview se for imagem
+  if (file.type.startsWith('image/')) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      document.getElementById(previewId).src = e.target.result;
-      document.getElementById(previewId).style.display = 'block';
-      state.data[dataKey] = true; // Flag indicando que foi enviado
-      
-      // Atualiza visual do card
-      input.parentElement.style.borderColor = 'var(--success)';
-      input.parentElement.style.background = 'rgba(18,183,106,0.05)';
+      preview.src = e.target.result;
+      preview.style.display = 'block';
     };
     reader.readAsDataURL(file);
   }
+
+  // Efeito visual de Loading (simula OCR)
+  box.classList.add('loading');
+
+  setTimeout(() => {
+    box.classList.remove('loading');
+    box.classList.add('success');
+    
+    // Salva no estado que foi enviado com sucesso
+    if (side === 'front') state.data.docFront = 'success';
+    if (side === 'back') state.data.docBack = 'success';
+  }, 2000); // 2 segundos de "análise"
 }
 
 /* ============================================================
-   ETAPA 5: SELFIE
+   ETAPA 5: SELFIE (SIMULAÇÃO DE PROVA DE VIDA)
    ============================================================ */
 function renderSelfie(c) {
   c.innerHTML = `
@@ -672,12 +711,12 @@ function renderSelfie(c) {
     <p class="subtitle">Vamos tirar uma selfie para confirmar que é você.</p>
     
     <div class="camera-sim" id="camera-area">
-      <div class="camera-oval"></div>
+      <div class="camera-oval" id="camera-oval"></div>
       <svg id="camera-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:48px;height:48px;z-index:10;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      <p style="color:white; z-index:10; margin-top: 16px; font-size: 14px; text-align:center;">Posicione seu rosto dentro da moldura</p>
+      <p id="camera-text" style="color:white; z-index:10; margin-top: 16px; font-size: 14px; text-align:center;">Posicione seu rosto<br>dentro da moldura</p>
     </div>
 
-    <input type="file" id="file-selfie" accept="image/*" capture="user" style="display:none" onchange="handleSelfie(this)">
+    <input type="file" id="file-selfie" accept="image/*" capture="user" style="display:none" onchange="simulateSelfie(this)">
 
     <button class="btn btn-outline" id="btn-camera" onclick="document.getElementById('file-selfie').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -688,17 +727,29 @@ function renderSelfie(c) {
   `;
 }
 
-function handleSelfie(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const cameraArea = document.getElementById('camera-area');
-      cameraArea.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-      document.getElementById('btn-camera').classList.add('hidden');
-      state.data.selfie = true;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+function simulateSelfie(input) {
+  if (!input.files || !input.files[0]) return;
+
+  const cameraArea = document.getElementById('camera-area');
+  const cameraText = document.getElementById('camera-text');
+  const btn = document.getElementById('btn-camera');
+
+  // Simula o loading de comparação facial
+  cameraArea.classList.add('loading');
+  cameraText.innerHTML = 'Analisando biometria...';
+  btn.classList.add('hidden');
+
+  setTimeout(() => {
+    cameraArea.classList.remove('loading');
+    cameraArea.innerHTML = `
+      <img src="${URL.createObjectURL(input.files[0])}" style="width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(18,183,106,0.9); color:white; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>
+        Rosto verificado
+      </div>
+    `;
+    state.data.selfie = true;
+  }, 2000);
 }
 
 /* ============================================================
@@ -711,10 +762,10 @@ function renderPassword(c) {
     
     <div class="input-group">
       <label>Senha</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <input type="password" id="inp-pwd" placeholder="Digite sua senha" oninput="checkStrength(this.value)">
-        <button onclick="togglePwd()" style="position:absolute;right:16px;background:none;border:none;cursor:pointer;">
+        <button onclick="togglePwd()" style="position:absolute;right:16px;background:none;border:none;cursor:pointer;padding:8px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--text-mute);"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
@@ -727,11 +778,11 @@ function renderPassword(c) {
 
     <div class="input-group">
       <label>Confirmar senha</label>
-      <div class="input-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="input-wrapper has-icon">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <input type="password" id="inp-pwd-confirm" placeholder="Repita a senha">
       </div>
-      <div class="error-msg" id="err-pwd">As senhas não coincidem.</div>
+      <div class="error-msg" id="err-pwd">As senhas não coincidem ou são muito curtas.</div>
     </div>
 
     <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
@@ -776,7 +827,7 @@ function renderReview(c) {
       <div class="review-row"><span>CPF</span><strong>${state.data.cpf}</strong></div>
       <div class="review-row"><span>Nascimento</span><strong>${state.data.birthdate.split('-').reverse().join('/')}</strong></div>
       <div class="review-row"><span>E-mail</span><strong>${state.data.email}</strong></div>
-      <div class="review-row"><span>Telefone</span><strong>(${state.data.ddd}) ${state.data.phone}</strong></div>
+      <div class="review-row"><span>Telefone</span><strong>${state.data.phone}</strong></div>
     </div>
     
     <div class="review-card">
@@ -784,6 +835,11 @@ function renderReview(c) {
       <div class="review-row"><span>Endereço</span><strong>${state.data.address}, ${state.data.addressNum}</strong></div>
       <div class="review-row"><span>Bairro</span><strong>${state.data.neighborhood}</strong></div>
       <div class="review-row"><span>Cidade/UF</span><strong>${state.data.city} - ${state.data.uf}</strong></div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-row"><span>Documento</span><strong>Verificado ✅</strong></div>
+      <div class="review-row"><span>Biometria</span><strong>Verificada ✅</strong></div>
     </div>
 
     <label style="display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--text-dim); margin:16px 0; cursor:pointer;">
@@ -815,7 +871,7 @@ function validateCurrentStep() {
 
   if (config.id === 'contact') {
     if (!state.data.email.includes('@')) { showErr('err-email'); isValid = false; }
-    if (state.data.ddd.length < 2 || state.data.phone.length < 8) { showErr('err-phone'); isValid = false; }
+    if (state.data.phone.replace(/\D/g, '').length < 10) { showErr('err-phone'); isValid = false; }
   }
 
   if (config.id === 'address') {
@@ -823,7 +879,8 @@ function validateCurrentStep() {
   }
 
   if (config.id === 'document') {
-    if (!state.data.docFront) { alert('Envie a frente do documento.'); isValid = false; }
+    if (!state.data.docType) { showErr('err-doctype'); isValid = false; }
+    if (state.data.docFront !== 'success') { alert('Envie a frente do documento.'); isValid = false; }
   }
 
   if (config.id === 'selfie') {
@@ -833,8 +890,7 @@ function validateCurrentStep() {
   if (config.id === 'password') {
     const pwd = document.getElementById('inp-pwd').value;
     const confirm = document.getElementById('inp-pwd-confirm').value;
-    if (pwd.length < 8) { alert('A senha deve ter no mínimo 8 caracteres.'); isValid = false; }
-    if (pwd !== confirm) { showErr('err-pwd'); isValid = false; }
+    if (pwd.length < 8 || pwd !== confirm) { showErr('err-pwd'); isValid = false; }
   }
 
   if (config.id === 'review') {
@@ -847,7 +903,6 @@ function validateCurrentStep() {
 function showErr(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = 'block';
-  // Limpa erro após 3s
   setTimeout(() => { if (el) el.style.display = 'none'; }, 3000);
 }
 
@@ -859,7 +914,6 @@ function submitApplication() {
   btn.innerHTML = '<div style="width:20px;height:20px;border:3px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>';
   btn.disabled = true;
 
-  // Simula requisição ao backend
   setTimeout(() => {
     const protocol = 'NX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     document.getElementById('app-header').classList.add('hidden');
