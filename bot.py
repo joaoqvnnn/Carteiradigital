@@ -200,7 +200,7 @@ Para abrir sua conta, você precisa aceitar:
 
 _Versão dos termos: v1.0 · {date}_"""
 
-TXT_ANALISE = "🔎 *Solicitação em análise*\n\nRecebemos seu cadastro! A instituição parceira está analisando sua solicitação.\n\n⏱ Prazo médio: até 24h úteis.\n\n🧪 _Modo demo — clique em "Consultar status" para simular aprovação._"
+TXT_ANALISE = "🔎 *Solicitação em análise*\n\nRecebemos seu cadastro! A instituição parceira está analisando sua solicitação.\n\n⏱ Prazo médio: até 24h úteis.\n\n🧪 _Modo demo — clique em 'Consultar status' para simular aprovação._"
 
 TXT_APROVADO = "🎉 *Conta aprovada!*\n\nParabéns, *{name}*! Sua conta foi aberta com sucesso.\n\n📋 *Dados da conta*\n• Identificador: `{account_id}`\n• Instituição: Instituição Parceira Demo\n• Status: Ativa ✅"
 
@@ -300,7 +300,6 @@ async def _handle_cb(cb: CallbackQuery):
     # ---------- WELCOME ----------
     if data == "abrir_conta":
         if session["state"] not in ("inicio", "recusado"):
-            # idempotência: já em fluxo
             await show(u.id, "⚠️ Você já tem um cadastro em andamento.", kb_recomecar(), session)
             return
         await save_session(u.id, state="aguardando_nome", data={})
@@ -329,7 +328,6 @@ async def _handle_cb(cb: CallbackQuery):
         return
 
     if data == "continuar":
-        # Reexibe a tela do estado atual
         await _render_current(u.id, session)
         return
 
@@ -429,7 +427,6 @@ async def _kyc_simulate(user_id: int):
 
 
 async def _render_current(user_id: int, session):
-    """Reexibe a tela do estado atual sem perder dados."""
     st = session["state"]
     d = session["data"]
     if st == "aguardando_nome":
