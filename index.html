@@ -1,1318 +1,886 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#0A2540" />
-<title>Nexo — Abra sua conta</title>
+<title>Nexo — Abertura de Conta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy-900:#04101F;--navy-800:#071A33;--navy-700:#0A2540;--navy-600:#102E52;
-  --blue-500:#1E62F0;--blue-400:#3B7CFF;--blue-300:#7BA4FF;--blue-100:#E5EDFF;
-  --success:#12B76A;--danger:#F04438;
-  --r-lg:16px;--r-md:12px;--r-sm:8px;
-  --t:200ms cubic-bezier(.22,1,.36,1);
-  --safe-b:env(safe-area-inset-bottom,0px);
+/* ============================================================
+   DESIGN SYSTEM (Baseado em Tailwind / Fintech Premium)
+   ============================================================ */
+:root {
+  --navy-900: #04101F;
+  --navy-700: #0A2540;
+  --navy-500: #163A6B;
+  --blue-500: #1E62F0;
+  --blue-100: #E5EDFF;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --text: #0A2540;
+  --text-dim: #64748B;
+  --text-mute: #94A3B8;
+  --border: #E2E8F0;
+  --success: #12B76A;
+  --danger: #F04438;
+  --warn: #F79009;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-[data-theme="light"]{
-  --bg:#FFFFFF;--surface:#F8FAFC;--surface-2:#F1F5F9;
-  --text:#0A2540;--text-dim:#64748B;--text-mute:#94A3B8;
-  --border:#E2E8F0;--input-bg:#F8FAFC;
-  --card-grad-a:#0A2540;--card-grad-b:#102E52;
-  --shadow:0 1px 3px rgba(10,37,64,0.05);
-  --shadow-lg:0 8px 32px rgba(10,37,64,0.08);
-  --nav-bg:rgba(255,255,255,0.98);--nav-border:rgba(10,37,64,0.06);
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  height: 100dvh;
 }
-[data-theme="dark"]{
-  --bg:#04101F;--surface:#0A1A33;--surface-2:#0F2444;
-  --text:#FFFFFF;--text-dim:#8CA2BF;--text-mute:#5A6E88;
-  --border:#163A6B;--input-bg:#0F2444;
-  --card-grad-a:#0F2E5C;--card-grad-b:#04101F;
-  --shadow:0 2px 8px rgba(0,0,0,0.3);
-  --shadow-lg:0 12px 40px rgba(0,0,0,0.4);
-  --nav-bg:rgba(10,26,51,0.98);--nav-border:rgba(255,255,255,0.06);
+
+#app {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.05);
 }
-html,body{height:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,sans-serif;
-  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
-  overflow:hidden;font-variant-numeric:tabular-nums;
-  transition:background var(--t),color var(--t);
+
+/* ============================================================
+   ANIMAÇÕES (Framer Motion Style)
+   ============================================================ */
+.fade-in { animation: fadeIn 0.4s ease-out forwards; }
+.slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.slide-out { animation: slideOut 0.3s ease-in forwards; }
+.pop-in { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.pulse { animation: pulse 2s infinite; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+/* ============================================================
+   COMPONENTES UI
+   ============================================================ */
+.header {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  z-index: 10;
 }
-button,input,select{font-family:inherit;color:inherit;border:none;background:none;outline:none}
-button{cursor:pointer}
-a{color:var(--blue-500);text-decoration:none}
-::-webkit-scrollbar{display:none}
-#app{position:relative;width:100%;height:100%;max-width:480px;margin:0 auto;background:var(--bg);overflow:hidden}
-
-/* ============ SCREENS ============ */
-.screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;transition:opacity .3s;
+.btn-back {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: var(--transition);
 }
-.screen.active{opacity:1;pointer-events:auto}
-.screen.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.btn-back:active { background: var(--bg); transform: scale(0.95); }
+.btn-back svg { width: 20px; height: 20px; color: var(--text); }
 
-/* ============ SPLASH ============ */
-#scr-splash{background:var(--navy-700);align-items:center;justify-content:center;gap:20px}
-.splash-mark{width:80px;height:80px;border-radius:20px;background:#fff;display:grid;place-items:center;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:splashIn .8s cubic-bezier(.22,1,.36,1)}
-.splash-mark svg{width:40px;height:40px;color:var(--navy-700)}
-.splash-word{color:#fff;font-size:28px;font-weight:700;letter-spacing:-.8px;animation:splashIn .8s .15s both}
-.splash-loader{margin-top:8px;width:24px;height:24px;border-radius:50%;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes splashIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.progress-container { flex: 1; }
+.progress-text {
+  font-size: 12px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 8px; display: flex; justify-content: space-between;
+}
+.progress-bar {
+  height: 4px; background: var(--border); border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--blue-500); width: 0%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-/* ============ LOGIN ============ */
-#scr-login{background:var(--bg)}
-.login-wrap{flex:1;display:flex;flex-direction:column;padding:0 24px calc(24px + var(--safe-b));max-width:400px;margin:0 auto;width:100%;overflow-y:auto}
-.login-header{padding-top:56px;text-align:center}
-.login-logo{width:56px;height:56px;border-radius:14px;background:var(--navy-700);display:grid;place-items:center;margin:0 auto 24px;box-shadow:0 8px 20px rgba(10,37,64,.15)}
-.login-logo svg{width:28px;height:28px;color:#fff}
-.login-title{font-size:28px;font-weight:800;letter-spacing:-.8px;line-height:1.2;color:var(--text);margin-bottom:8px}
-.login-sub{font-size:15px;color:var(--text-dim);line-height:1.5}
+.content {
+  flex: 1; padding: 12px 24px 24px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column;
+}
 
-.login-tabs{display:flex;background:var(--surface);border-radius:var(--r-md);padding:4px;margin-top:32px;border:1px solid var(--border)}
-.login-tab{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;color:var(--text-dim);text-align:center;transition:all var(--t)}
-.login-tab.active{background:var(--navy-700);color:#fff;box-shadow:0 2px 8px rgba(10,37,64,.15)}
-[data-theme="dark"] .login-tab.active{background:var(--blue-500)}
+.title { font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+.subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
 
-.login-field{margin-top:20px}
-.login-field label{display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px;letter-spacing:.1px}
-.login-input-wrap{position:relative;display:flex;align-items:center}
-.login-input{width:100%;padding:16px 18px;border-radius:var(--r-md);background:var(--input-bg);border:1.5px solid var(--border);font-size:16px;color:var(--text);font-weight:500;transition:border-color var(--t),background var(--t)}
-.login-input:focus{border-color:var(--blue-500);background:var(--bg)}
-.login-input::placeholder{color:var(--text-mute);font-weight:400}
-.login-eye{position:absolute;right:14px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%}
-.login-eye svg{width:18px;height:18px;color:var(--text-mute)}
-.login-aux{display:flex;justify-content:flex-end;margin-top:12px}
-.login-aux a{font-size:13.5px;font-weight:500;color:var(--blue-500)}
-.login-btn{width:100%;padding:17px;border-radius:var(--r-md);background:var(--navy-700);color:#fff;font-size:16px;font-weight:700;letter-spacing:-.2px;margin-top:24px;transition:transform var(--t),opacity var(--t);box-shadow:0 4px 14px rgba(10,37,64,.2)}
-.login-btn:active{transform:scale(.98)}
-.login-btn:disabled{opacity:.5}
-[data-theme="dark"] .login-btn{background:var(--blue-500)}
-.login-divider{display:flex;align-items:center;gap:14px;margin-top:28px;color:var(--text-mute);font-size:12px;font-weight:500}
-.login-divider::before,.login-divider::after{content:"";flex:1;height:1px;background:var(--border)}
-.login-alt{display:flex;flex-direction:column;gap:10px;margin-top:16px}
-.alt-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text);transition:background var(--t)}
-.alt-btn:active{background:var(--surface-2)}
-.alt-btn svg{width:20px;height:20px}
-.login-footer{margin-top:auto;padding-top:32px;text-align:center}
-.login-footer .create-account{font-size:14.5px;color:var(--text-dim)}
-.login-footer .create-account a{font-weight:700;color:var(--blue-500)}
-.login-terms{margin-top:20px;font-size:11.5px;color:var(--text-mute);line-height:1.5}
-.login-terms a{color:var(--blue-500)}
-.err{color:var(--danger);font-size:13px;font-weight:500;margin-top:10px;display:none}
-.err.show{display:block}
+.input-group { margin-bottom: 16px; position: relative; }
+.input-group label {
+  display: block; font-size: 13px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.input-wrapper {
+  position: relative; display: flex; align-items: center;
+}
+.input-wrapper svg {
+  position: absolute; left: 16px; width: 20px; height: 20px; color: var(--text-mute);
+  pointer-events: none; transition: var(--transition);
+}
+.input-wrapper input, .input-wrapper select {
+  width: 100%; padding: 16px 16px 16px 48px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: 16px; color: var(--text); background: var(--surface);
+  transition: var(--transition); outline: none;
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  appearance: none;
+}
+.input-wrapper input::placeholder { color: var(--text-mute); font-weight: 400; }
+.input-wrapper input:focus, .input-wrapper select:focus {
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 4px rgba(30, 98, 240, 0.1);
+}
+.input-wrapper input:focus + svg { color: var(--blue-500); }
+.input-wrapper.error input { border-color: var(--danger); }
+.input-wrapper.error + .error-msg { display: block; }
+.error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
 
-/* ============ ONBOARDING WIZARD ============ */
-#scr-onboarding{background:var(--bg)}
-.onb-top{display:flex;align-items:center;gap:14px;padding:20px 24px 8px;max-width:400px;margin:0 auto;width:100%}
-.onb-back{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0}
-.onb-back:active{background:var(--surface-2)}
-.onb-back svg{width:18px;height:18px;color:var(--text)}
-.onb-progress{flex:1;height:3px;background:var(--surface-2);border-radius:3px;overflow:hidden}
-.onb-progress-fill{height:100%;background:var(--blue-500);border-radius:3px;transition:width .4s cubic-bezier(.22,1,.36,1);width:0%}
-.onb-stepnum{font-size:13px;color:var(--text-mute);font-weight:600;min-width:36px;text-align:right}
+.row { display: flex; gap: 12px; }
+.row > .input-group { flex: 1; }
 
-.onb-body{flex:1;overflow-y:auto;padding:32px 24px calc(24px + var(--safe-b));display:flex;flex-direction:column;max-width:400px;margin:0 auto;width:100%}
-.onb-step{display:none;flex-direction:column;flex:1;animation:onbIn .35s cubic-bezier(.22,1,.36,1)}
-.onb-step.active{display:flex}
-@keyframes onbIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-.onb-question{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.2;margin-bottom:10px}
-.onb-hint{font-size:14px;color:var(--text-dim);line-height:1.5;margin-bottom:24px}
-.onb-input{width:100%;padding:18px 20px;border-radius:var(--r-md);background:var(--input-bg);border:1.5px solid transparent;font-size:17px;color:var(--text);font-weight:500;transition:border-color var(--t),background var(--t)}
-.onb-input:focus{border-color:var(--blue-500);background:var(--bg)}
-.onb-input::placeholder{color:var(--text-mute);font-weight:400}
-.onb-select{width:100%;padding:18px 20px;border-radius:var(--r-md);background:var(--input-bg);border:1.5px solid transparent;font-size:17px;color:var(--text);font-weight:500;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center}
-.onb-select:focus{border-color:var(--blue-500);background-color:var(--bg)}
-.onb-row{display:flex;gap:12px}
-.onb-row > *{flex:1}
-.onb-radio-group{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.onb-radio-option{padding:16px;border-radius:var(--r-md);background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color var(--t),background var(--t)}
-.onb-radio-option.selected{border-color:var(--blue-500);background:rgba(30,98,240,0.05)}
-.onb-radio-option .radio-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;flex-shrink:0}
-.onb-radio-option.selected .radio-circle{border-color:var(--blue-500)}
-.onb-radio-option.selected .radio-circle::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--blue-500)}
-.onb-radio-option div strong{font-size:15px;font-weight:600;display:block}
-.onb-radio-option div small{font-size:13px;color:var(--text-dim);display:block;margin-top:2px;line-height:1.3}
+.btn {
+  width: 100%; padding: 16px; border-radius: var(--radius);
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); border: none;
+  display: flex; justify-content: center; align-items: center; gap: 8px;
+  font-family: 'Inter', sans-serif; margin-top: auto;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--navy-700); color: white; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary:hover { background: var(--navy-900); }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-outline:hover { background: var(--bg); }
+.btn svg { width: 20px; height: 20px; }
 
-.onb-upload{width:100%;padding:32px;border-radius:var(--r-md);border:2px dashed var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;cursor:pointer;transition:border-color var(--t)}
-.onb-upload:active{border-color:var(--blue-500)}
-.onb-upload svg{width:32px;height:32px;color:var(--text-mute)}
-.onb-upload strong{font-size:14px;font-weight:600}
-.onb-upload small{font-size:12px;color:var(--text-dim)}
-.onb-upload.success{border-color:var(--success);background:rgba(18,183,106,0.05)}
-.onb-upload.success svg{color:var(--success)}
+/* Tela de boas vindas */
+.welcome-screen {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  height: 100%; text-align: center; padding: 24px;
+  background: var(--navy-700); color: white; position: absolute; inset: 0; z-index: 50;
+}
+.welcome-logo {
+  width: 80px; height: 80px; background: white; border-radius: 20px;
+  display: grid; place-items: center; margin-bottom: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--navy-700);
+}
+.welcome-logo svg { width: 40px; height: 40px; }
+.welcome-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; }
+.welcome-subtitle { font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 48px; line-height: 1.5; }
+.welcome-actions { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+.welcome-actions .btn-primary { background: white; color: var(--navy-700); }
+.welcome-actions .btn-primary:hover { background: #f0f0f0; }
+.welcome-actions .btn-outline { border-color: rgba(255,255,255,0.3); color: white; }
+.welcome-actions .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
-.onb-error{color:var(--danger);font-size:13px;margin-top:12px;font-weight:500;min-height:18px}
-.onb-spacer{flex:1;min-height:24px}
-.onb-actions{display:flex;flex-direction:column;gap:12px}
-.onb-btn{width:100%;padding:17px;border-radius:var(--r-md);background:var(--navy-700);color:#fff;font-size:16px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform var(--t),opacity var(--t)}
-.onb-btn:active{transform:scale(.98)}
-.onb-btn:disabled{opacity:.5}
-.onb-btn svg{width:18px;height:18px}
-[data-theme="dark"] .onb-btn{background:var(--blue-500)}
+/* OTP */
+.otp-container { display: flex; gap: 8px; justify-content: center; margin: 24px 0; }
+.otp-input {
+  width: 48px; height: 56px; text-align: center; font-size: 24px; font-weight: 700;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  background: var(--bg); color: var(--text);
+}
+.otp-input:focus { border-color: var(--blue-500); background: white; outline: none; }
 
-/* Success */
-.onb-success{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:60px;flex:1}
-.onb-success-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--success),#0B8A4C);display:grid;place-items:center;box-shadow:0 12px 32px rgba(18,183,106,.35);animation:pop .5s cubic-bezier(.22,1,.36,1)}
-@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.onb-success-icon svg{width:40px;height:40px;color:#fff}
-.onb-success h1{font-size:26px;font-weight:800;margin-top:24px;letter-spacing:-.5px}
-.onb-success p{color:var(--text-dim);font-size:15px;line-height:1.5;margin-top:10px;max-width:300px}
-.onb-success-actions{margin-top:auto;width:100%;padding-top:32px}
+/* Uploads */
+.upload-box {
+  border: 2px dashed var(--border); border-radius: var(--radius-lg);
+  padding: 32px 16px; text-align: center; cursor: pointer;
+  transition: var(--transition); background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.upload-box:hover { border-color: var(--blue-500); background: var(--blue-100); }
+.upload-box svg { width: 32px; height: 32px; color: var(--blue-500); }
+.upload-box span { font-size: 14px; font-weight: 600; color: var(--text); }
+.upload-box small { font-size: 12px; color: var(--text-dim); }
+.upload-box input[type="file"] { display: none; }
+.upload-preview { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius); display: none; margin-top: 12px; }
 
-/* ============ APP SHELL ============ */
-#scr-app{background:var(--bg)}
-.app-scroll{flex:1;overflow-y:auto;padding-bottom:calc(76px + var(--safe-b))}
-.tab{display:none;padding:0 20px}
-.tab.active{display:block;animation:tabIn .28s cubic-bezier(.22,1,.36,1)}
-@keyframes tabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* Câmera / Selfie */
+.camera-sim {
+  width: 100%; aspect-ratio: 3/4; background: #000; border-radius: var(--radius-lg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; margin-bottom: 16px;
+}
+.camera-oval {
+  width: 65%; aspect-ratio: 3/4; border: 3px solid rgba(255,255,255,0.5);
+  border-radius: 50%; position: absolute; top: 15%;
+  box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+}
 
-.home-head{display:flex;align-items:center;gap:12px;padding:24px 20px 16px}
-.avatar{width:44px;height:44px;border-radius:50%;background:var(--navy-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:16px;flex-shrink:0}
-.home-greet{flex:1;min-width:0}
-.home-greet small{color:var(--text-dim);font-size:13px}
-.home-greet h2{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;position:relative}
-.icon-btn:active{background:var(--surface-2)}
-.icon-btn svg{width:20px;height:20px;color:var(--text)}
-.icon-btn .dot{position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--blue-500);border:2px solid var(--surface)}
+/* Medidor de senha */
+.password-strength { display: flex; gap: 4px; margin-top: 8px; height: 4px; }
+.strength-bar { flex: 1; background: var(--border); border-radius: 4px; transition: var(--transition); }
+.strength-bar.active.weak { background: var(--danger); }
+.strength-bar.active.medium { background: var(--warn); }
+.strength-bar.active.strong { background: var(--success); }
 
-.balance-card{margin:4px 20px 0;padding:24px;border-radius:var(--r-lg);background:linear-gradient(135deg,var(--card-grad-a) 0%,var(--card-grad-b) 100%);color:#fff;position:relative;overflow:hidden;box-shadow:0 12px 32px rgba(10,37,64,.25)}
-.balance-card::before{content:"";position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.2),transparent 70%)}
-.bc-label{font-size:13px;opacity:.7;letter-spacing:.2px;font-weight:500;position:relative;z-index:1}
-.bc-eye{position:absolute;top:22px;right:22px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;z-index:2}
-.bc-eye svg{width:18px;height:18px;color:#fff}
-.bc-amount{font-size:38px;font-weight:800;letter-spacing:-1.2px;margin-top:8px;position:relative;z-index:1;line-height:1.1;transition:filter .25s}
-.bc-amount.hidden{filter:blur(12px)}
-.bc-bottom{display:flex;gap:28px;margin-top:20px;position:relative;z-index:1;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
-.bc-bottom div small{display:block;font-size:11px;opacity:.6;letter-spacing:.3px;font-weight:500}
-.bc-bottom div strong{font-size:14px;font-weight:700;margin-top:4px;display:block}
+/* Revisão */
+.review-card { background: var(--bg); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.review-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.review-row:last-child { border-bottom: none; }
+.review-row span { color: var(--text-dim); }
+.review-row strong { font-weight: 600; text-align: right; max-width: 60%; }
 
-.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 20px 0}
-.qa{display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform var(--t)}
-.qa:active{transform:scale(.94)}
-.qa-ico{width:52px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:var(--shadow)}
-.qa-ico svg{width:22px;height:22px;color:var(--navy-700)}
-[data-theme="dark"] .qa-ico svg{color:var(--blue-300)}
-.qa span{font-size:11.5px;font-weight:600;color:var(--text-dim);text-align:center;line-height:1.2}
+/* Sucesso */
+.success-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+.check-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(18,183,106,0.1); display: grid; place-items: center; margin-bottom: 24px; }
+.check-circle svg { width: 40px; height: 40px; stroke: var(--success); stroke-dasharray: 50; stroke-dashoffset: 50; animation: drawCheck 1s ease-out forwards; }
+.protocol-badge { background: var(--bg); border: 1px solid var(--border); padding: 12px 24px; border-radius: 100px; font-size: 16px; font-weight: 700; margin: 16px 0; letter-spacing: 1px; }
 
-.section{margin-top:28px}
-.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.section-head h3{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.section-head a{font-size:13px;color:var(--blue-500);font-weight:600}
-
-.card-preview{aspect-ratio:1.586/1;border-radius:var(--r-lg);padding:20px;color:#fff;background:linear-gradient(135deg,var(--navy-700) 0%,var(--navy-600) 60%,var(--navy-500) 100%);position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.2)}
-.card-preview::before{content:"";position:absolute;top:-100px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.25),transparent 70%)}
-.cp-brand{font-size:15px;font-weight:800;letter-spacing:-.3px;position:relative;z-index:1}
-.cp-chip{position:absolute;top:18px;right:20px;width:36px;height:26px;border-radius:5px;background:linear-gradient(135deg,#E8C87A,#B8923D);position:relative;z-index:1}
-.cp-num{font-family:ui-monospace,Menlo,monospace;font-size:16px;letter-spacing:2px;margin-top:26px;position:relative;z-index:1;font-weight:500}
-.cp-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;position:relative;z-index:1}
-.cp-foot small{font-size:9px;opacity:.65;letter-spacing:.5px;display:block;font-weight:500}
-.cp-foot strong{font-size:12px;font-weight:700;margin-top:3px;display:block}
-.cp-flag{font-style:italic;font-weight:900;font-size:15px;letter-spacing:-.5px}
-
-.chart-card{background:var(--surface);border-radius:var(--r-lg);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow)}
-.chart-legend{display:flex;gap:20px;margin-bottom:16px}
-.chart-legend span{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);font-weight:500}
-.chart-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
-.chart-legend i.in{background:var(--success)}
-.chart-legend i.out{background:var(--blue-500)}
-.chart-svg{width:100%;height:120px;display:block}
-
-.tx-list{display:flex;flex-direction:column;gap:4px}
-.tx{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--border);transition:background var(--t)}
-.tx:last-child{border-bottom:none}
-.tx:active{background:var(--surface-2)}
-.tx-ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:var(--surface-2)}
-.tx-ico.in{background:rgba(18,183,106,.12)}
-.tx-ico.in svg{color:var(--success)}
-.tx-ico.out{background:rgba(30,98,240,.1)}
-.tx-ico.out svg{color:var(--blue-500)}
-.tx-ico svg{width:18px;height:18px}
-.tx-body{flex:1;min-width:0}
-.tx-body strong{display:block;font-size:14.5px;font-weight:600;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-body small{display:block;font-size:12.5px;color:var(--text-dim);margin-top:3px}
-.tx-amount{font-size:14.5px;font-weight:700;white-space:nowrap;letter-spacing:-.2px}
-.tx-amount.in{color:var(--success)}
-.tx-amount.out{color:var(--text)}
-
-.screen-title{font-size:26px;font-weight:800;letter-spacing:-.7px;margin-top:24px}
-.screen-sub{color:var(--text-dim);font-size:14px;margin-top:6px}
-.cards-tabs{display:flex;gap:8px;margin:20px 0 16px;overflow-x:auto;padding-bottom:2px}
-.chip{padding:9px 18px;border-radius:100px;background:var(--surface);border:1px solid var(--border);font-size:13.5px;font-weight:600;color:var(--text-dim);white-space:nowrap;transition:all var(--t)}
-.chip.active{background:var(--navy-700);color:#fff;border-color:var(--navy-700)}
-[data-theme="dark"] .chip.active{background:var(--blue-500);border-color:var(--blue-500)}
-
-.actions-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px}
-.act-item{padding:16px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:12px;transition:transform var(--t),background var(--t)}
-.act-item:active{transform:scale(.97);background:var(--surface-2)}
-.act-ico{width:38px;height:38px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;flex-shrink:0}
-.act-ico svg{width:18px;height:18px;color:var(--navy-700)}
-[data-theme="dark"] .act-ico svg{color:var(--blue-300)}
-.act-item div{flex:1;min-width:0}
-.act-item strong{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.2px}
-.act-item small{display:block;font-size:11.5px;color:var(--text-dim);margin-top:2px}
-
-.toggle-group{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);overflow:hidden;margin-top:20px}
-.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
-.toggle-row:last-child{border-bottom:none}
-.toggle-row strong{font-size:14px;font-weight:600;display:block;letter-spacing:-.2px}
-.toggle-row small{font-size:12px;color:var(--text-dim);display:block;margin-top:3px}
-.switch{width:48px;height:28px;border-radius:100px;background:var(--border);position:relative;transition:background var(--t);flex-shrink:0;cursor:pointer}
-.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform var(--t);box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.switch.on{background:var(--blue-500)}
-.switch.on::after{transform:translateX(20px)}
-
-.pix-hero{border-radius:var(--r-lg);padding:24px;color:#fff;margin-top:20px;background:linear-gradient(135deg,var(--navy-700),var(--navy-500));position:relative;overflow:hidden}
-.pix-hero::before{content:"";position:absolute;top:-60px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.25),transparent 70%)}
-.pix-hero h3{font-size:18px;font-weight:700;letter-spacing:-.3px;position:relative;z-index:1}
-.pix-hero p{font-size:13.5px;opacity:.75;margin-top:6px;position:relative;z-index:1;line-height:1.4}
-.pix-hero button{margin-top:18px;padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy-700);font-weight:700;font-size:13.5px;position:relative;z-index:1}
-.pix-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
-.pix-opt{padding:18px 16px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:12px;text-align:left;transition:transform var(--t)}
-.pix-opt:active{transform:scale(.97)}
-.pix-opt-ico{width:42px;height:42px;border-radius:11px;background:var(--surface-2);display:grid;place-items:center}
-.pix-opt-ico svg{width:20px;height:20px;color:var(--navy-700)}
-[data-theme="dark"] .pix-opt-ico svg{color:var(--blue-300)}
-.pix-opt strong{font-size:14px;font-weight:600;letter-spacing:-.2px}
-.pix-opt small{font-size:11.5px;color:var(--text-dim);line-height:1.3;margin-top:2px}
-.fav-row{display:flex;gap:14px;overflow-x:auto;padding:4px 0 8px}
-.fav{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:64px}
-.fav-av{width:52px;height:52px;border-radius:50%;background:var(--navy-700);display:grid;place-items:center;color:#fff;font-weight:700;font-size:16px}
-[data-theme="dark"] .fav-av{background:var(--blue-500)}
-.fav span{font-size:11.5px;color:var(--text-dim);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-weight:500}
-
-.filter-row{display:flex;gap:8px;margin:20px 0 16px;overflow-x:auto;padding-bottom:2px}
-.date-group{margin-bottom:20px}
-.date-group h5{font-size:12px;font-weight:600;color:var(--text-mute);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-
-.profile-head{display:flex;flex-direction:column;align-items:center;padding:24px 0 8px}
-.profile-av{width:80px;height:80px;border-radius:50%;background:var(--navy-700);display:grid;place-items:center;color:#fff;font-weight:700;font-size:28px;box-shadow:0 8px 24px rgba(10,37,64,.2)}
-[data-theme="dark"] .profile-av{background:var(--blue-500)}
-.profile-head h3{margin-top:14px;font-size:20px;font-weight:700;letter-spacing:-.4px}
-.profile-head p{color:var(--text-dim);font-size:14px;margin-top:2px}
-.menu-group{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);overflow:hidden;margin-top:20px}
-.menu-item{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);transition:background var(--t);width:100%;text-align:left}
-.menu-item:last-child{border-bottom:none}
-.menu-item:active{background:var(--surface-2)}
-.menu-ico{width:38px;height:38px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;flex-shrink:0}
-.menu-ico svg{width:18px;height:18px;color:var(--navy-700)}
-[data-theme="dark"] .menu-ico svg{color:var(--blue-300)}
-.menu-item div{flex:1}
-.menu-item strong{font-size:14px;font-weight:600;display:block;letter-spacing:-.2px}
-.menu-item small{font-size:12px;color:var(--text-dim);display:block;margin-top:2px}
-.menu-item > svg{width:16px;height:16px;color:var(--text-mute)}
-.menu-item.danger .menu-ico{background:rgba(240,68,56,.1)}
-.menu-item.danger .menu-ico svg{color:var(--danger)}
-.menu-item.danger strong{color:var(--danger)}
-.app-footer{text-align:center;padding:32px 20px;color:var(--text-mute);font-size:11.5px;line-height:1.6}
-
-.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:calc(68px + var(--safe-b));padding:0 12px var(--safe-b);display:flex;align-items:center;justify-content:space-around;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--nav-border);z-index:50}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;color:var(--text-mute);transition:color var(--t)}
-.nav-item svg{width:22px;height:22px;transition:transform var(--t)}
-.nav-item span{font-size:10.5px;font-weight:600;letter-spacing:-.1px}
-.nav-item.active{color:var(--navy-700)}
-[data-theme="dark"] .nav-item.active{color:var(--blue-400)}
-.nav-item.active svg{transform:translateY(-1px)}
-
-.modal-overlay{position:absolute;inset:0;background:rgba(4,16,31,.55);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.modal-overlay.show{display:flex;animation:fadeIn .2s}
-.modal{width:100%;max-width:480px;background:var(--bg);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + var(--safe-b));transform:translateY(100%);animation:slideUp .32s cubic-bezier(.22,1,.36,1) forwards;max-height:85%;overflow-y:auto}
-.modal h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
-.modal p{font-size:14px;color:var(--text-dim);margin-bottom:18px;line-height:1.5}
-.modal .btn{margin-top:8px}
-.modal-grip{width:36px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 18px}
-@keyframes slideUp{to{transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.detail-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
-.detail-row:last-child{border-bottom:none}
-.detail-row span{color:var(--text-dim)}
-.detail-row strong{font-weight:600;text-align:right}
-
-.toast{position:absolute;top:20px;left:50%;transform:translate(-50%,-100px);background:var(--navy-700);color:#fff;padding:14px 22px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:200;transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 8px 32px rgba(0,0,0,.25);max-width:88%;text-align:center}
-.toast.show{transform:translate(-50%,0)}
-.toast.err{background:var(--danger)}
-
-.hide{display:none!important}
+/* Utilitários */
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- SPLASH -->
-  <div class="screen active" id="scr-splash">
-    <div class="splash-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+  <!-- TELA DE BOAS VINDAS -->
+  <div class="welcome-screen fade-in" id="screen-welcome">
+    <div class="welcome-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
     </div>
-    <div class="splash-word">nexo</div>
-    <div class="splash-loader"></div>
+    <h1 class="welcome-title">Abra sua conta</h1>
+    <p class="welcome-subtitle">Sua nova conta digital gratuita, segura e pronta em minutos.</p>
+    
+    <div class="welcome-actions">
+      <button class="btn btn-primary" onclick="startOnboarding()">Começar agora</button>
+      <button class="btn btn-outline" onclick="alert('Redirecionando para login...')">Já tenho uma conta</button>
+    </div>
+    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 24px;">
+      Ao continuar você aceita nossos <br> 
+      <a href="#" style="color:white; text-decoration: underline;">Termos de Uso</a> e <a href="#" style="color:white; text-decoration: underline;">Política de Privacidade</a>.
+    </p>
   </div>
 
-  <!-- LOGIN -->
-  <div class="screen scroll" id="scr-login">
-    <div class="login-wrap">
-      <div class="login-header">
-        <div class="login-logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
-        </div>
-        <h1 class="login-title">Bem-vindo de volta</h1>
-        <p class="login-sub">Acesse sua conta Nexo com segurança</p>
+  <!-- HEADER (Aparece durante o onboarding) -->
+  <div class="header hidden" id="app-header">
+    <button class="btn-back" onclick="prevStep()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="progress-container">
+      <div class="progress-text">
+        <span id="step-name">Dados Pessoais</span>
+        <span id="step-counter">Passo 1 de 6</span>
       </div>
-      <div class="login-tabs" id="login-tabs">
-        <button class="login-tab active" data-method="cpf">CPF</button>
-        <button class="login-tab" data-method="email">E-mail</button>
-      </div>
-      <div class="login-field">
-        <label id="login-label">CPF</label>
-        <div class="login-input-wrap">
-          <input class="login-input" id="login-identifier" type="text" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="username" />
-        </div>
-      </div>
-      <div class="login-field">
-        <label>Senha</label>
-        <div class="login-input-wrap">
-          <input class="login-input" id="login-pass" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
-          <button class="login-eye" id="toggle-pass" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="login-aux"><a href="#" id="forgot-pass">Esqueci minha senha</a></div>
-      <div class="err" id="login-err"></div>
-      <button class="login-btn" id="btn-login">Entrar</button>
-      <div class="login-divider">ou acesse com</div>
-      <div class="login-alt">
-        <button class="alt-btn" id="btn-biometric">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"/><path d="M6 12a6 6 0 0 1 12 0v2a6 6 0 0 1-12 0v-2z"/><path d="M3 12a9 9 0 0 1 18 0v2a9 9 0 0 1-18 0v-2z"/></svg>
-          Entrar com biometria
-        </button>
-      </div>
-      <div class="login-footer">
-        <div class="create-account">Ainda não tem conta? <a href="#" id="go-register">Abra sua conta</a></div>
-        <div class="login-terms">Ao continuar você aceita nossos<br><a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
       </div>
     </div>
   </div>
 
-  <!-- ONBOARDING -->
-  <div class="screen" id="scr-onboarding">
-    <div class="onb-top">
-      <button class="onb-back" id="onb-back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <div class="onb-progress"><div class="onb-progress-fill" id="onb-progress"></div></div>
-      <span class="onb-stepnum" id="onb-stepnum">1/14</span>
-    </div>
-    <div class="onb-body" id="onb-body"></div>
+  <!-- CONTEÚDO DINÂMICO -->
+  <div class="content hidden" id="app-content">
+    <!-- O JS injeta o HTML dos formulários aqui -->
   </div>
-
-  <!-- APP MAIN -->
-  <div class="screen" id="scr-app">
-    <div class="app-scroll">
-      <div class="tab active" id="tab-home">
-        <div class="home-head">
-          <div class="avatar" id="home-avatar">J</div>
-          <div class="home-greet">
-            <small id="home-hi">Bom dia,</small>
-            <h2 id="home-name">João</h2>
-          </div>
-          <button class="icon-btn" id="btn-notif">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span class="dot"></span>
-          </button>
-        </div>
-        <div class="balance-card">
-          <div class="bc-label">Saldo disponível</div>
-          <button class="bc-eye" id="btn-eye">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <div class="bc-amount hidden" id="home-balance">R$ ••••••</div>
-          <div class="bc-bottom">
-            <div><small>Reservado</small><strong id="home-reserved">R$ ••••</strong></div>
-            <div><small>Conta</small><strong>Ag 0001 • 12345-6</strong></div>
-          </div>
-        </div>
-        <div class="quick-actions">
-          <button class="qa" data-action="pix"><div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L22 12 12 22 2 12z"/></svg></div><span>Pix</span></button>
-          <button class="qa" data-action="add"><div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div><span>Adicionar</span></button>
-          <button class="qa" data-action="pay"><div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><span>Pagar</span></button>
-          <button class="qa" data-action="transfer"><div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l10-10M7 7h10v10"/></svg></div><span>Transferir</span></button>
-        </div>
-        <div class="section">
-          <div class="section-head"><h3>Meu cartão</h3><a href="#" data-jump="cards">Ver todos</a></div>
-          <div class="card-preview">
-            <div class="cp-brand">nexo</div><div class="cp-chip"></div>
-            <div class="cp-num" id="home-card-num">•••• •••• •••• 4829</div>
-            <div class="cp-foot"><div><small>TITULAR</small><strong id="home-card-name">JOÃO SILVA</strong></div><div class="cp-flag">VISA</div></div>
-          </div>
-        </div>
-        <div class="section">
-          <div class="section-head"><h3>Movimentação semanal</h3></div>
-          <div class="chart-card">
-            <div class="chart-legend"><span><i class="in"></i>Entradas</span><span><i class="out"></i>Saídas</span></div>
-            <svg class="chart-svg" id="chart" viewBox="0 0 340 120" preserveAspectRatio="none"></svg>
-          </div>
-        </div>
-        <div class="section">
-          <div class="section-head"><h3>Últimas movimentações</h3><a href="#" data-jump="extrato">Ver tudo</a></div>
-          <div class="tx-list" id="home-tx"></div>
-        </div>
-        <div style="height:8px"></div>
-      </div>
-
-      <div class="tab" id="tab-cards">
-        <h2 class="screen-title">Meus cartões</h2>
-        <p class="screen-sub">Gerencie seu cartão virtual e físico</p>
-        <div class="cards-tabs"><button class="chip active">Virtual</button><button class="chip">Físico</button></div>
-        <div class="card-preview" style="position:relative">
-          <div class="cp-brand">nexo</div><div class="cp-chip"></div>
-          <div class="cp-num" id="tab-card-num">•••• •••• •••• 4829</div>
-          <div class="cp-foot"><div><small>VALIDADE</small><strong id="tab-card-exp">••/••</strong></div><div><small>CVV</small><strong id="tab-card-cvv">•••</strong></div><div class="cp-flag">VISA</div></div>
-          <button style="position:absolute;top:16px;right:66px;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.15);display:grid;place-items:center;z-index:2" id="btn-reveal-card">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-        <div class="actions-grid">
-          <button class="act-item" data-act="block"><div class="act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><strong>Bloquear</strong><small>Cartão ativo</small></div></button>
-          <button class="act-item" data-act="second"><div class="act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div><strong>2ª via</strong><small>Solicitar</small></div></button>
-          <button class="act-item" data-act="limits"><div class="act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div><div><strong>Limites</strong><small>R$ 5.000</small></div></button>
-          <button class="act-item" data-act="pwd"><div class="act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div><strong>Senha</strong><small>Alterar</small></div></button>
-        </div>
-        <div class="section">
-          <div class="section-head"><h3>Configurações</h3></div>
-          <div class="toggle-group">
-            <div class="toggle-row"><div><strong>Compras online</strong><small>Habilita uso em sites e apps</small></div><div class="switch on" data-switch="online"></div></div>
-            <div class="toggle-row"><div><strong>Pagamento por aproximação</strong><small>NFC habilitado</small></div><div class="switch on" data-switch="nfc"></div></div>
-            <div class="toggle-row"><div><strong>Compras internacionais</strong><small>Habilita moeda estrangeira</small></div><div class="switch" data-switch="intl"></div></div>
-          </div>
-        </div>
-        <div class="section"><div class="section-head"><h3>Últimas compras</h3></div><div class="tx-list" id="card-tx"></div></div>
-        <div style="height:12px"></div>
-      </div>
-
-      <div class="tab" id="tab-pix">
-        <h2 class="screen-title">Pix</h2>
-        <div class="pix-hero"><h3>Envie em segundos</h3><p>Sem taxas. 24 horas por dia.</p><button data-pix="qr">Escanear QR Code</button></div>
-        <div class="section"><div class="section-head"><h3>Enviar</h3></div>
-          <div class="pix-grid">
-            <button class="pix-opt" data-pix="key"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3M9 17H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><path d="M8 12h8"/></svg></div><strong>Por chave</strong><small>CPF, e-mail, telefone</small></button>
-            <button class="pix-opt" data-pix="bank"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6M3 9v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9M9 21V13h6v8"/></svg></div><strong>Dados bancários</strong><small>Agência e conta</small></button>
-            <button class="pix-opt" data-pix="copy"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div><strong>Copia e cola</strong><small>Código Pix</small></button>
-            <button class="pix-opt" data-pix="receive"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><strong>Receber</strong><small>Gerar QR Code</small></button>
-          </div>
-        </div>
-        <div class="section"><div class="section-head"><h3>Favoritos</h3></div><div class="fav-row" id="pix-favs"></div></div>
-        <div class="section"><div class="section-head"><h3>Histórico Pix</h3></div><div class="tx-list" id="pix-tx"></div></div>
-        <div style="height:12px"></div>
-      </div>
-
-      <div class="tab" id="tab-extrato">
-        <h2 class="screen-title">Extrato</h2><p class="screen-sub">Acompanhe suas movimentações</p>
-        <div class="filter-row"><button class="chip active" data-filter="all">Todas</button><button class="chip" data-filter="in">Entradas</button><button class="chip" data-filter="out">Saídas</button></div>
-        <div id="extrato-groups"></div><div style="height:12px"></div>
-      </div>
-
-      <div class="tab" id="tab-perfil">
-        <div class="profile-head"><div class="profile-av" id="profile-av">J</div><h3 id="profile-name">João Silva</h3><p id="profile-email">joao@email.com</p></div>
-        <div class="menu-group">
-          <button class="menu-item" data-menu="dados"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><strong>Dados pessoais</strong><small>Nome, CPF, documentos</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-          <button class="menu-item" data-menu="security"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><strong>Segurança</strong><small>Senha, biometria, dispositivos</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-          <button class="menu-item" data-menu="notif"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div><strong>Notificações</strong><small>Alertas e preferências</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-          <button class="menu-item" data-menu="theme"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div><div><strong>Aparência</strong><small id="theme-label">Claro</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-          <button class="menu-item" data-menu="help"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div><div><strong>Ajuda & suporte</strong><small>Chat e atendimento</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-        </div>
-        <div class="menu-group">
-          <button class="menu-item danger" data-menu="logout"><div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div><div><strong>Sair da conta</strong><small>Encerrar sessão</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-        </div>
-        <div class="app-footer">Nexo Wallet • v1.0.0<br>Conta de pagamento — instituição parceira autorizada</div>
-      </div>
-    </div>
-
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg><span>Início</span></button>
-      <button class="nav-item" data-tab="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Cartões</span></button>
-      <button class="nav-item" data-tab="pix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L22 12 12 22 2 12z"/></svg><span>Pix</span></button>
-      <button class="nav-item" data-tab="extrato"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Extrato</span></button>
-      <button class="nav-item" data-tab="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Perfil</span></button>
-    </nav>
-  </div>
-
-  <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
-  <div class="toast" id="toast"></div>
 </div>
 
 <script>
 /* ============================================================
-   NEXO WALLET — Módulo 1 (Frontend + Onboarding completo)
+   ESTADO GLOBAL E CONFIGURAÇÃO
    ============================================================ */
-
-const CONFIG = {
-  API_BASE: '',        // ex: 'https://sua-api.onrender.com'
-  DEMO_MODE: true,
-  TIMEOUT: 8000
-};
-
-const API = {
-  token: null,
-  async request(path, opts = {}) {
-    const url = (CONFIG.API_BASE || '') + path;
-    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-    if (API.token) headers['Authorization'] = 'Bearer ' + API.token;
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT);
-    try {
-      const res = await fetch(url, { ...opts, headers, signal: ctrl.signal });
-      clearTimeout(t);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return await res.json();
-    } catch (e) { clearTimeout(t); throw e; }
-  },
-  login:    (b) => API.request('/api/auth/login',    { method:'POST', body: JSON.stringify(b) }),
-  register: (b) => API.request('/api/auth/register', { method:'POST', body: JSON.stringify(b) }),
-  me:       ()  => API.request('/api/me'),
-  balance:  ()  => API.request('/api/account/balance'),
-  tx:       ()  => API.request('/api/transactions'),
-  cards:    ()  => API.request('/api/cards'),
-  pixSend:  (b) => API.request('/api/pix/send',  { method:'POST', body: JSON.stringify(b) }),
-  pixKeys:  ()  => API.request('/api/pix/keys'),
-};
-
-const DEMO = {
-  user: { name:'João Silva', email:'joao@email.com', cpf:'123.456.789-00' },
-  balance: 2847.50,
-  reserved: 500.00,
-  card: { last4:'4829', exp:'12/29', cvv:'842', flag:'VISA', titular:'JOÃO SILVA' },
-  transactions: [
-    { id:'t1', type:'in',  title:'Pix recebido',         sub:'Maria Souza',        amount:450.00,  date:'2025-01-15T10:22:00', status:'concluido' },
-    { id:'t2', type:'out', title:'Pix enviado',          sub:'Carlos Lima',        amount:120.00,  date:'2025-01-15T08:05:00', status:'concluido' },
-    { id:'t3', type:'out', title:'Compra no débito',     sub:'Padaria Pão Quente', amount:28.50,   date:'2025-01-14T19:40:00', status:'concluido' },
-    { id:'t4', type:'in',  title:'Depósito',             sub:'Boleto compensado',  amount:1200.00, date:'2025-01-14T11:00:00', status:'concluido' },
-    { id:'t5', type:'out', title:'Pagamento de boleto',  sub:'Energia Elétrica',   amount:187.32,  date:'2025-01-13T09:15:00', status:'concluido' },
-    { id:'t6', type:'out', title:'Pix enviado',          sub:'Ana Beatriz',        amount:80.00,   date:'2025-01-12T16:30:00', status:'pendente' },
-    { id:'t7', type:'in',  title:'Pix recebido',         sub:'Empresa XYZ Ltda',   amount:2500.00, date:'2025-01-11T08:00:00', status:'concluido' },
-    { id:'t8', type:'out', title:'Recarga celular',      sub:'Vivo — (11)99999',   amount:30.00,   date:'2025-01-10T14:22:00', status:'concluido' },
-  ],
-  favorites: [
-    { name:'Maria',  initial:'M' }, { name:'Carlos', initial:'C' },
-    { name:'Ana',    initial:'A' }, { name:'Pedro',  initial:'P' },
-    { name:'Julia',  initial:'J' },
-  ],
-  chart: {
-    in:  [0, 1200, 0, 450, 2500, 0, 0],
-    out: [100, 187, 28, 120, 30, 80, 0],
-    labels: ['9','10','11','12','13','14','15']
-  }
-};
-
 const state = {
-  user: null, balance: 0, reserved: 0, card: null,
-  transactions: [], favorites: [], chart: null,
-  showBalance: false, showCardData: false,
-  theme: localStorage.getItem('nexo-theme') || 'light',
-  activeTab: 'home', filter: 'all', cardBlocked: false,
-  loginMethod: 'cpf',
-  onb: { step: 0, data: {} }
+  step: 0,
+  data: {
+    name: '', cpf: '', birthdate: '', nationality: 'Brasileira', country: 'Brasil',
+    email: '', phone: '', ddd: '',
+    cep: '', address: '', addressNum: '', addressComp: '', neighborhood: '', city: '', uf: '',
+    docType: '', docFront: null, docBack: null,
+    selfie: false,
+    password: '',
+    terms: false
+  }
 };
 
-const $  = (s, r=document) => r.querySelector(s);
-const $$ = (s, r=document) => [...r.querySelectorAll(s)];
-const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-
-function showToast(msg, isErr=false) {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.toggle('err', isErr);
-  t.classList.add('show');
-  clearTimeout(t._to);
-  t._to = setTimeout(() => t.classList.remove('show'), 2600);
-}
-function showScreen(id) {
-  $$('.screen').forEach(s => s.classList.remove('active'));
-  $('#' + id).classList.add('active');
-}
-function setTab(name) {
-  state.activeTab = name;
-  $$('.tab').forEach(t => t.classList.remove('active'));
-  $('#tab-' + name).classList.add('active');
-  $$('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === name));
-  $('.app-scroll').scrollTop = 0;
-}
-function toggleModal(html) {
-  const ov = $('#modal-overlay');
-  if (html === null) {
-    ov.classList.remove('show');
-    setTimeout(() => { $('#modal-content').innerHTML = ''; }, 220);
-  } else {
-    $('#modal-content').innerHTML = html;
-    ov.classList.add('show');
-  }
-}
-function applyTheme() {
-  const pref = state.theme;
-  const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  const real = pref === 'auto' ? sys : pref;
-  document.documentElement.setAttribute('data-theme', real);
-  const lbl = { auto:'Automático', dark:'Escuro', light:'Claro' }[pref];
-  if ($('#theme-label')) $('#theme-label').textContent = lbl;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', real === 'dark' ? '#04101F' : '#FFFFFF');
-}
-function cycleTheme() {
-  const order = ['light','dark','auto'];
-  state.theme = order[(order.indexOf(state.theme)+1) % 3];
-  localStorage.setItem('nexo-theme', state.theme);
-  applyTheme();
-  showToast('Tema: ' + ({auto:'Automático',light:'Claro',dark:'Escuro'}[state.theme]));
-}
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Bom dia';
-  if (h < 18) return 'Boa tarde';
-  return 'Boa noite';
-}
-function calcAge(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  if (isNaN(d)) return -1;
-  const now = new Date();
-  let age = now.getFullYear() - d.getFullYear();
-  const m = now.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
-  return age;
-}
-
-/* ============ LOGIN ============ */
-function setLoginMethod(method) {
-  state.loginMethod = method;
-  $$('.login-tab').forEach(t => t.classList.toggle('active', t.dataset.method === method));
-  const label = $('#login-label');
-  const input = $('#login-identifier');
-  if (method === 'cpf') {
-    label.textContent = 'CPF';
-    input.placeholder = '000.000.000-00';
-    input.maxLength = 14;
-    input.inputMode = 'numeric';
-    input.value = '';
-  } else {
-    label.textContent = 'E-mail';
-    input.placeholder = 'voce@email.com';
-    input.maxLength = 60;
-    input.inputMode = 'email';
-    input.value = '';
-  }
-}
-
-function bindLogin() {
-  $$('.login-tab').forEach(t => t.onclick = () => setLoginMethod(t.dataset.method));
-  $('#login-identifier').addEventListener('input', e => {
-    if (state.loginMethod !== 'cpf') return;
-    let v = e.target.value.replace(/\D/g,'').slice(0,11);
-    v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-    e.target.value = v;
-  });
-  $('#toggle-pass').onclick = () => {
-    const p = $('#login-pass');
-    p.type = p.type === 'password' ? 'text' : 'password';
-  };
-  $('#btn-login').onclick = doLogin;
-  $('#login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  $('#forgot-pass').onclick = e => { e.preventDefault(); showToast('Link de recuperação enviado (simulação)'); };
-  $('#btn-biometric').onclick = () => showToast('Autenticação biométrica (simulação)');
-  $('#go-register').onclick = e => {
-    e.preventDefault();
-    state.onb = { step: 0, data: {} };
-    showScreen('scr-onboarding');
-    renderOnbStep();
-  };
-}
-
-async function doLogin() {
-  const identifier = $('#login-identifier').value.trim();
-  const pass = $('#login-pass').value;
-  const err = $('#login-err');
-  err.classList.remove('show');
-  if (!identifier || !pass) {
-    err.textContent = 'Preencha todos os campos.';
-    err.classList.add('show'); return;
-  }
-  if (state.loginMethod === 'cpf' && identifier.replace(/\D/g,'').length !== 11) {
-    err.textContent = 'CPF inválido. Digite os 11 dígitos.';
-    err.classList.add('show'); return;
-  }
-  const btn = $('#btn-login');
-  btn.disabled = true; btn.textContent = 'Entrando…';
-  try {
-    let data;
-    if (CONFIG.DEMO_MODE) {
-      await new Promise(r => setTimeout(r, 700));
-      data = { user: DEMO.user, token: 'demo-token' };
-    } else {
-      data = await API.login({ identifier, password: pass, method: state.loginMethod });
-      API.token = data.token;
-    }
-    state.user = data.user;
-    await loadAppData();
-    showScreen('scr-app');
-    renderAll();
-    bindApp();
-  } catch (e) {
-    err.textContent = 'Não foi possível entrar. Verifique os dados.';
-    err.classList.add('show');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Entrar';
-  }
-}
-
-/* ============ ONBOARDING COMPLETO ============ */
-const ONB_STEPS = [
-  // 1. Finalidade
-  {
-    key: 'purpose', type: 'radio',
-    question: 'Para qual finalidade você quer abrir a conta?',
-    hint: 'Escolha o tipo de conta que melhor atende às suas necessidades.',
-    options: [
-      { value: 'personal', title: 'Para finanças pessoais', desc: 'Conta digital para pessoa física, com Pix, cartão e pagamentos.' },
-      { value: 'business', title: 'Para gerir meu negócio', desc: 'Conta para empreendedores, autônomos e pessoas jurídicas.' }
-    ],
-    validate: v => v ? true : 'Escolha uma opção.'
-  },
-  // 2. CPF
-  {
-    key: 'cpf', type: 'text', placeholder: '000.000.000-00', maxLength: 14, mask: 'cpf', inputmode: 'numeric',
-    question: 'Qual é o seu CPF?',
-    hint: 'O CPF é obrigatório para abertura de conta e será validado junto à Receita Federal.',
-    validate: v => v.replace(/\D/g,'').length === 11 || 'CPF deve ter 11 dígitos.'
-  },
-  // 3. Nome completo
-  {
-    key: 'name', type: 'text', placeholder: 'Digite seu nome completo',
-    question: 'Qual é o seu nome completo?',
-    hint: 'Como aparece no seu documento de identidade oficial.',
-    validate: v => v.trim().split(/\s+/).length >= 2 || 'Informe nome e sobrenome.'
-  },
-  // 4. Data de nascimento
-  {
-    key: 'birth', type: 'date',
-    question: 'Qual é a sua data de nascimento?',
-    hint: 'É necessário ter 18 anos ou mais para abrir a conta.',
-    validate: v => v && calcAge(v) >= 18 ? true : 'Você precisa ter 18 anos ou mais.'
-  },
-  // 5. País de nascimento
-  {
-    key: 'birthCountry', type: 'select', options: ['Brasil', 'Outro'],
-    question: 'Qual é o seu país de nascimento?',
-    hint: 'Selecione o país onde você nasceu.',
-    validate: v => v ? true : 'Selecione o país.'
-  },
-  // 6. Profissão
-  {
-    key: 'profession', type: 'select', options: ['Administrador','Advogado','Autônomo','Comerciante','Desenvolvedor','Engenheiro','Estudante','Médico','Professor','Outro'],
-    question: 'Qual é a sua profissão?',
-    hint: 'Usamos essa informação para adequar os serviços oferecidos.',
-    validate: v => v ? true : 'Selecione sua profissão.'
-  },
-  // 7. E-mail
-  {
-    key: 'email', type: 'email', placeholder: 'voce@email.com', inputmode: 'email',
-    question: 'Qual é o seu e-mail?',
-    hint: 'Enviaremos um código de confirmação para este e-mail.',
-    validate: v => /^\S+@\S+\.\S+$/.test(v) || 'Digite um e-mail válido.'
-  },
-  // 8. Confirmação de e-mail
-  {
-    key: 'emailConfirm', type: 'email', placeholder: 'Digite o e-mail novamente', inputmode: 'email',
-    question: 'Confirme o seu e-mail',
-    hint: 'Digite novamente para garantir que não houve erros.',
-    validate: v => v === state.onb.data.email || 'Os e-mails não coincidem.'
-  },
-  // 9. Celular
-  {
-    key: 'phone', type: 'tel', placeholder: '(11) 99999-9999', maxLength: 15, mask: 'phone', inputmode: 'tel',
-    question: 'Qual é o seu celular?',
-    hint: 'Você receberá um código de confirmação por SMS ou WhatsApp.',
-    validate: v => v.replace(/\D/g,'').length >= 10 || 'Digite um celular válido.'
-  },
-  // 10. Canal de verificação
-  {
-    key: 'verifyChannel', type: 'radio',
-    question: 'Como você quer receber o código de verificação?',
-    hint: 'Escolha o canal mais conveniente para você.',
-    options: [
-      { value: 'sms', title: 'SMS', desc: 'Enviaremos um código por mensagem de texto.' },
-      { value: 'whatsapp', title: 'WhatsApp', desc: 'Receba o código diretamente no seu WhatsApp.' }
-    ],
-    validate: v => v ? true : 'Escolha um canal.'
-  },
-  // 11. CEP e endereço
-  {
-    key: 'cep', type: 'text', placeholder: '00000-000', maxLength: 9, mask: 'cep', inputmode: 'numeric',
-    question: 'Qual é o seu CEP?',
-    hint: 'Informe o CEP da sua residência para preenchermos o endereço.',
-    validate: v => v.replace(/\D/g,'').length === 8 || 'CEP deve ter 8 dígitos.'
-  },
-  // 12. Endereço completo
-  {
-    key: 'address', type: 'text', placeholder: 'Rua, número, complemento, bairro, cidade - UF',
-    question: 'Confirme seu endereço completo',
-    hint: 'Endereço residencial completo, conforme comprovante.',
-    validate: v => v.trim().length >= 10 || 'Informe o endereço completo.'
-  },
-  // 13. Documento
-  {
-    key: 'document', type: 'upload', uploadLabel: 'Enviar documento com foto',
-    uploadHint: 'RG, CNH ou passaporte (frente e verso)',
-    question: 'Envie seu documento de identidade',
-    hint: 'Aceitamos RG, CNH ou passaporte. O documento deve estar legível e dentro da validade.',
-    validate: v => v === true ? true : 'Envie o documento.'
-  },
-  // 14. Selfie
-  {
-    key: 'selfie', type: 'upload', uploadLabel: 'Tirar selfie de verificação',
-    uploadHint: 'Siga as instruções na tela para posicionar seu rosto',
-    question: 'Tire uma selfie para verificação',
-    hint: 'Usamos a selfie para confirmar que você é o titular dos documentos.',
-    validate: v => v === true ? true : 'Envie a selfie.'
-  },
-  // 15. Senha
-  {
-    key: 'password', type: 'password', placeholder: 'Mínimo 8 caracteres',
-    question: 'Crie uma senha de acesso',
-    hint: 'Use pelo menos 8 caracteres, misturando letras e números.',
-    validate: v => v.length >= 8 || 'A senha deve ter pelo menos 8 caracteres.'
-  },
-  // 16. Termos
-  {
-    key: 'terms', type: 'radio',
-    question: 'Termos e condições',
-    hint: 'Leia e aceite os termos para concluir a abertura da conta.',
-    options: [
-      { value: 'accepted', title: 'Li e aceito os Termos de Uso e a Política de Privacidade', desc: '' }
-    ],
-    validate: v => v === 'accepted' ? true : 'Aceite os termos para continuar.'
-  }
+const stepsConfig = [
+  { id: 'personal', name: 'Dados Pessoais' },
+  { id: 'contact', name: 'Contatos' },
+  { id: 'address', name: 'Endereço' },
+  { id: 'document', name: 'Documentos' },
+  { id: 'selfie', name: 'Reconhecimento Facial' },
+  { id: 'password', name: 'Segurança' },
+  { id: 'review', name: 'Revisão' }
 ];
 
-function renderOnbStep() {
-  const idx = state.onb.step;
-  const total = ONB_STEPS.length;
-  if (idx >= total) { renderOnbSuccess(); return; }
+/* ============================================================
+   CONTROLE DE NAVEGAÇÃO
+   ============================================================ */
+function startOnboarding() {
+  document.getElementById('screen-welcome').classList.add('hidden');
+  document.getElementById('app-header').classList.remove('hidden');
+  document.getElementById('app-content').classList.remove('hidden');
+  state.step = 0;
+  renderStep();
+}
 
-  const step = ONB_STEPS[idx];
-  $('#onb-stepnum').textContent = `${idx + 1}/${total}`;
-  $('#onb-progress').style.width = `${((idx + 1) / total) * 100}%`;
+function updateHeader() {
+  const config = stepsConfig[state.step];
+  document.getElementById('step-name').textContent = config.name;
+  document.getElementById('step-counter').textContent = `Passo ${state.step + 1} de ${stepsConfig.length}`;
+  const pct = ((state.step + 1) / stepsConfig.length) * 100;
+  document.getElementById('progress-fill').style.width = `${pct}%`;
+}
 
-  let fieldHTML = '';
+function prevStep() {
+  if (state.step > 0) {
+    state.step--;
+    renderStep();
+  } else {
+    document.getElementById('screen-welcome').classList.remove('hidden');
+    document.getElementById('app-header').classList.add('hidden');
+    document.getElementById('app-content').classList.add('hidden');
+  }
+}
 
-  if (step.type === 'text' || step.type === 'email' || step.type === 'tel' || step.type === 'password') {
-    fieldHTML = `
-      <input class="onb-input" id="onb-field" type="${step.type}"
-        placeholder="${step.placeholder || ''}"
-        ${step.maxLength ? `maxlength="${step.maxLength}"` : ''}
-        ${step.inputmode ? `inputmode="${step.inputmode}"` : ''}
-        value="${state.onb.data[step.key] || ''}" />
-    `;
-  } else if (step.type === 'date') {
-    fieldHTML = `<input class="onb-input" id="onb-field" type="date" value="${state.onb.data[step.key] || ''}" />`;
-  } else if (step.type === 'select') {
-    const opts = step.options.map(o => `<option value="${o}" ${state.onb.data[step.key] === o ? 'selected' : ''}>${o}</option>`).join('');
-    fieldHTML = `<select class="onb-select" id="onb-field"><option value="" disabled ${!state.onb.data[step.key] ? 'selected' : ''}>Selecione...</option>${opts}</select>`;
-  } else if (step.type === 'radio') {
-    const opts = step.options.map(o => `
-      <div class="onb-radio-option ${state.onb.data[step.key] === o.value ? 'selected' : ''}" data-value="${o.value}">
-        <div class="radio-circle"></div>
-        <div>
-          <strong>${o.title}</strong>
-          ${o.desc ? `<small>${o.desc}</small>` : ''}
+function nextStep() {
+  if (validateCurrentStep()) {
+    if (state.step < stepsConfig.length - 1) {
+      state.step++;
+      renderStep();
+    } else {
+      submitApplication();
+    }
+  }
+}
+
+/* ============================================================
+   RENDERIZAÇÃO DAS TELAS (ETAPAS)
+   ============================================================ */
+function renderStep() {
+  updateHeader();
+  const container = document.getElementById('app-content');
+  
+  // Animação de saída
+  container.classList.remove('slide-in');
+  container.classList.add('slide-out');
+  
+  setTimeout(() => {
+    container.innerHTML = '';
+    const config = stepsConfig[state.step];
+    
+    if (config.id === 'personal') renderPersonal(container);
+    if (config.id === 'contact') renderContact(container);
+    if (config.id === 'address') renderAddress(container);
+    if (config.id === 'document') renderDocument(container);
+    if (config.id === 'selfie') renderSelfie(container);
+    if (config.id === 'password') renderPassword(container);
+    if (config.id === 'review') renderReview(container);
+
+    // Animação de entrada
+    container.classList.remove('slide-out');
+    container.classList.add('slide-in');
+    container.scrollTop = 0;
+  }, 300);
+}
+
+/* ============================================================
+   ETAPA 1: DADOS PESSOAIS
+   ============================================================ */
+function renderPersonal(c) {
+  c.innerHTML = `
+    <h2 class="title">Seus dados</h2>
+    <p class="subtitle">Precisamos dessas informações para criar sua conta.</p>
+    
+    <div class="input-group">
+      <label>Nome completo</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input type="text" id="inp-name" placeholder="Ex: João da Silva" value="${state.data.name}" oninput="state.data.name = this.value">
+      </div>
+      <div class="error-msg" id="err-name">Informe seu nome completo.</div>
+    </div>
+
+    <div class="input-group">
+      <label>CPF</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h5"/></svg>
+        <input type="tel" id="inp-cpf" placeholder="000.000.000-00" maxlength="14" value="${state.data.cpf}" oninput="maskCPF(this)">
+      </div>
+      <div class="error-msg" id="err-cpf">CPF inválido.</div>
+    </div>
+
+    <div class="input-group">
+      <label>Data de nascimento</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <input type="date" id="inp-birth" value="${state.data.birthdate}" onchange="state.data.birthdate = this.value">
+      </div>
+      <div class="error-msg" id="err-birth">Você precisa ter 18 anos ou mais.</div>
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <label>Nacionalidade</label>
+        <div class="input-wrapper">
+          <select onchange="state.data.nationality = this.value">
+            <option value="Brasileira" ${state.data.nationality === 'Brasileira' ? 'selected' : ''}>Brasileira</option>
+            <option value="Portuguesa">Portuguesa</option>
+            <option value="Outra">Outra</option>
+          </select>
         </div>
       </div>
-    `).join('');
-    fieldHTML = `<div class="onb-radio-group" id="onb-field">${opts}</div>`;
-  } else if (step.type === 'upload') {
-    const done = state.onb.data[step.key] === true;
-    fieldHTML = `
-      <div class="onb-upload ${done ? 'success' : ''}" id="onb-field">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          ${done
-            ? '<path d="M20 6L9 17l-5-5"/>'
-            : '<path d="M12 5v14M5 12h14"/>'}
-        </svg>
-        <strong>${done ? 'Enviado com sucesso!' : step.uploadLabel}</strong>
-        <small>${step.uploadHint}</small>
+      <div class="input-group">
+        <label>País de residência</label>
+        <div class="input-wrapper">
+          <select onchange="state.data.country = this.value">
+            <option value="Brasil" ${state.data.country === 'Brasil' ? 'selected' : ''}>Brasil</option>
+            <option value="Portugal">Portugal</option>
+          </select>
+        </div>
       </div>
-    `;
-  }
+    </div>
 
-  $('#onb-body').innerHTML = `
-    <div class="onb-step active">
-      <div class="onb-question">${step.question}</div>
-      <div class="onb-hint">${step.hint}</div>
-      ${fieldHTML}
-      <div class="onb-error" id="onb-error"></div>
-      <div class="onb-spacer"></div>
-      <div class="onb-actions">
-        <button class="onb-btn" id="onb-continue">
-          Continuar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
+  `;
+}
+
+function maskCPF(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  input.value = v;
+  state.data.cpf = v;
+}
+
+/* ============================================================
+   ETAPA 2: CONTATOS E OTP
+   ============================================================ */
+function renderContact(c) {
+  c.innerHTML = `
+    <h2 class="title">Como podemos falar com você?</h2>
+    <p class="subtitle">Enviaremos um código para confirmar seus dados.</p>
+    
+    <div class="input-group">
+      <label>E-mail</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input type="email" id="inp-email" placeholder="voce@email.com" value="${state.data.email}" oninput="state.data.email = this.value">
+      </div>
+      <div class="error-msg" id="err-email">Digite um e-mail válido.</div>
+    </div>
+
+    <div class="row">
+      <div class="input-group" style="flex: 0.4;">
+        <label>DDD</label>
+        <div class="input-wrapper">
+          <input type="tel" id="inp-ddd" placeholder="11" maxlength="2" value="${state.data.ddd}" oninput="state.data.ddd = this.value">
+        </div>
+      </div>
+      <div class="input-group" style="flex: 1.6;">
+        <label>Celular</label>
+        <div class="input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+          <input type="tel" id="inp-phone" placeholder="99999-9999" maxlength="10" value="${state.data.phone}" oninput="maskPhone(this)">
+        </div>
+        <div class="error-msg" id="err-phone">Celular inválido.</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
+  `;
+}
+
+function maskPhone(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  v = v.replace(/(\d{5})(\d)/, '$1-$2');
+  input.value = v;
+  state.data.phone = v;
+}
+
+/* ============================================================
+   ETAPA 3: ENDEREÇO (VIA CEP API REAL)
+   ============================================================ */
+function renderAddress(c) {
+  c.innerHTML = `
+    <h2 class="title">Onde você mora?</h2>
+    <p class="subtitle">Precisamos do seu endereço residencial.</p>
+    
+    <div class="input-group">
+      <label>CEP</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <input type="tel" id="inp-cep" placeholder="00000-000" maxlength="9" value="${state.data.cep}" oninput="maskCEP(this)" onblur="fetchCEP()">
+      </div>
+      <div class="error-msg" id="err-cep">CEP inválido.</div>
+      <div id="cep-loading" style="display:none; font-size:12px; color:var(--blue-500); margin-top:4px;">Buscando endereço...</div>
+    </div>
+
+    <div class="input-group">
+      <label>Rua / Logradouro</label>
+      <div class="input-wrapper">
+        <input type="text" id="inp-address" placeholder="Av. Paulista" value="${state.data.address}" oninput="state.data.address = this.value">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <label>Número</label>
+        <div class="input-wrapper">
+          <input type="text" id="inp-addressNum" placeholder="123" value="${state.data.addressNum}" oninput="state.data.addressNum = this.value">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Complemento</label>
+        <div class="input-wrapper">
+          <input type="text" placeholder="Apto 45" value="${state.data.addressComp}" oninput="state.data.addressComp = this.value">
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Bairro</label>
+      <div class="input-wrapper">
+        <input type="text" id="inp-neighborhood" placeholder="Bela Vista" value="${state.data.neighborhood}" oninput="state.data.neighborhood = this.value">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <label>Cidade</label>
+        <div class="input-wrapper">
+          <input type="text" id="inp-city" placeholder="São Paulo" value="${state.data.city}" oninput="state.data.city = this.value">
+        </div>
+      </div>
+      <div class="input-group" style="flex: 0.4;">
+        <label>UF</label>
+        <div class="input-wrapper">
+          <input type="text" id="inp-uf" placeholder="SP" maxlength="2" value="${state.data.uf}" oninput="state.data.uf = this.value">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
+  `;
+}
+
+function maskCEP(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 8) v = v.slice(0, 8);
+  v = v.replace(/(\d{5})(\d)/, '$1-$2');
+  input.value = v;
+  state.data.cep = v;
+}
+
+async function fetchCEP() {
+  const cep = state.data.cep.replace(/\D/g, '');
+  if (cep.length !== 8) return;
+  
+  document.getElementById('cep-loading').style.display = 'block';
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await res.json();
+    if (!data.erro) {
+      document.getElementById('inp-address').value = data.logradouro;
+      document.getElementById('inp-neighborhood').value = data.bairro;
+      document.getElementById('inp-city').value = data.localidade;
+      document.getElementById('inp-uf').value = data.uf;
+      
+      state.data.address = data.logradouro;
+      state.data.neighborhood = data.bairro;
+      state.data.city = data.localidade;
+      state.data.uf = data.uf;
+      
+      document.getElementById('inp-addressNum').focus();
+    }
+  } catch (e) {
+    console.error('Erro ao buscar CEP');
+  } finally {
+    document.getElementById('cep-loading').style.display = 'none';
+  }
+}
+
+/* ============================================================
+   ETAPA 4: DOCUMENTOS
+   ============================================================ */
+function renderDocument(c) {
+  c.innerHTML = `
+    <h2 class="title">Envie seu documento</h2>
+    <p class="subtitle">Escolha um documento oficial com foto.</p>
+    
+    <div class="input-group">
+      <label>Tipo de documento</label>
+      <div class="input-wrapper">
+        <select onchange="state.data.docType = this.value">
+          <option value="">Selecione...</option>
+          <option value="RG">RG</option>
+          <option value="CNH">CNH</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="upload-box" onclick="document.getElementById('file-front').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>Frente do documento</span>
+      <small>Tire uma foto nítida, sem reflexos.</small>
+      <input type="file" id="file-front" accept="image/*" capture="environment" onchange="handleUpload(this, 'docFront', 'preview-front')">
+      <img id="preview-front" class="upload-preview" src="" alt="Frente">
+    </label>
+
+    <label class="upload-box" onclick="document.getElementById('file-back').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>Verso do documento</span>
+      <small>Necessário para alguns documentos.</small>
+      <input type="file" id="file-back" accept="image/*" capture="environment" onchange="handleUpload(this, 'docBack', 'preview-back')">
+      <img id="preview-back" class="upload-preview" src="" alt="Verso">
+    </label>
+
+    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
+  `;
+}
+
+function handleUpload(input, dataKey, previewId) {
+  const file = input.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById(previewId).src = e.target.result;
+      document.getElementById(previewId).style.display = 'block';
+      state.data[dataKey] = true; // Flag indicando que foi enviado
+      
+      // Atualiza visual do card
+      input.parentElement.style.borderColor = 'var(--success)';
+      input.parentElement.style.background = 'rgba(18,183,106,0.05)';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/* ============================================================
+   ETAPA 5: SELFIE
+   ============================================================ */
+function renderSelfie(c) {
+  c.innerHTML = `
+    <h2 class="title">Reconhecimento Facial</h2>
+    <p class="subtitle">Vamos tirar uma selfie para confirmar que é você.</p>
+    
+    <div class="camera-sim" id="camera-area">
+      <div class="camera-oval"></div>
+      <svg id="camera-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:48px;height:48px;z-index:10;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <p style="color:white; z-index:10; margin-top: 16px; font-size: 14px; text-align:center;">Posicione seu rosto dentro da moldura</p>
+    </div>
+
+    <input type="file" id="file-selfie" accept="image/*" capture="user" style="display:none" onchange="handleSelfie(this)">
+
+    <button class="btn btn-outline" id="btn-camera" onclick="document.getElementById('file-selfie').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Abrir Câmera
+    </button>
+
+    <button class="btn btn-primary" style="margin-top:16px;" onclick="nextStep()">Continuar</button>
+  `;
+}
+
+function handleSelfie(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const cameraArea = document.getElementById('camera-area');
+      cameraArea.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+      document.getElementById('btn-camera').classList.add('hidden');
+      state.data.selfie = true;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+/* ============================================================
+   ETAPA 6: SENHA
+   ============================================================ */
+function renderPassword(c) {
+  c.innerHTML = `
+    <h2 class="title">Crie sua senha</h2>
+    <p class="subtitle">Ela será usada para acessar sua conta.</p>
+    
+    <div class="input-group">
+      <label>Senha</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="inp-pwd" placeholder="Digite sua senha" oninput="checkStrength(this.value)">
+        <button onclick="togglePwd()" style="position:absolute;right:16px;background:none;border:none;cursor:pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--text-mute);"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
-    </div>
-  `;
-
-  const field = $('#onb-field');
-  const err = $('#onb-error');
-
-  // Máscaras
-  if (step.mask === 'cpf') {
-    field.addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g,'').slice(0,11);
-      v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-      e.target.value = v;
-    });
-  } else if (step.mask === 'phone') {
-    field.addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g,'').slice(0,11);
-      v = v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
-      e.target.value = v;
-    });
-  } else if (step.mask === 'cep') {
-    field.addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g,'').slice(0,8);
-      v = v.replace(/(\d{5})(\d)/,'$1-$2');
-      e.target.value = v;
-    });
-  }
-
-  // Upload simulado
-  if (step.type === 'upload') {
-    field.onclick = () => {
-      field.classList.add('success');
-      field.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-        <strong>Enviado com sucesso!</strong>
-        <small>${step.uploadHint}</small>
-      `;
-      state.onb.data[step.key] = true;
-    };
-  }
-
-  // Radio
-  if (step.type === 'radio') {
-    $$('.onb-radio-option').forEach(opt => {
-      opt.onclick = () => {
-        $$('.onb-radio-option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        state.onb.data[step.key] = opt.dataset.value;
-      };
-    });
-  }
-
-  $('#onb-continue').onclick = nextOnb;
-  if (field && (step.type === 'text' || step.type === 'email' || step.type === 'tel' || step.type === 'password')) {
-    field.addEventListener('keydown', e => { if (e.key === 'Enter') nextOnb(); });
-    setTimeout(() => { try { field.focus(); } catch(e){} }, 120);
-  }
-}
-
-function nextOnb() {
-  const idx = state.onb.step;
-  const step = ONB_STEPS[idx];
-  const field = $('#onb-field');
-  const err = $('#onb-error');
-
-  let val = state.onb.data[step.key];
-
-  if (step.type !== 'radio' && step.type !== 'upload') {
-    val = field.value.trim();
-    if (step.type === 'select' && !val) {
-      err.textContent = 'Selecione uma opção.';
-      return;
-    }
-  }
-
-  const v = step.validate(val);
-  if (v !== true) {
-    err.textContent = v;
-    if (field && field.style) field.style.borderColor = 'var(--danger)';
-    return;
-  }
-
-  if (step.type !== 'radio' && step.type !== 'upload') {
-    state.onb.data[step.key] = val;
-  }
-
-  state.onb.step++;
-  if (state.onb.step >= ONB_STEPS.length) {
-    renderOnbSuccess();
-  } else {
-    renderOnbStep();
-  }
-}
-
-function renderOnbSuccess() {
-  $('#onb-stepnum').textContent = '✓';
-  $('#onb-progress').style.width = '100%';
-  $('#onb-back').style.display = 'none';
-  $('#onb-body').innerHTML = `
-    <div class="onb-success">
-      <div class="onb-success-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-      </div>
-      <h1>Conta criada com sucesso!</h1>
-      <p>Bem-vindo à Nexo, ${(state.onb.data.name || 'Cliente').split(' ')[0]}. Seus dados foram enviados para análise e você já pode acessar sua conta.</p>
-      <div class="onb-success-actions">
-        <button class="onb-btn" id="onb-finish">Acessar minha conta</button>
+      <div class="password-strength">
+        <div class="strength-bar" id="bar-1"></div>
+        <div class="strength-bar" id="bar-2"></div>
+        <div class="strength-bar" id="bar-3"></div>
       </div>
     </div>
+
+    <div class="input-group">
+      <label>Confirmar senha</label>
+      <div class="input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="inp-pwd-confirm" placeholder="Repita a senha">
+      </div>
+      <div class="error-msg" id="err-pwd">As senhas não coincidem.</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
   `;
-  $('#onb-finish').onclick = async () => {
-    state.user = {
-      name: state.onb.data.name || 'João Silva',
-      email: state.onb.data.email || 'joao@email.com',
-      cpf: state.onb.data.cpf || '123.456.789-00'
-    };
-    await loadAppData();
-    showScreen('scr-app');
-    renderAll();
-    bindApp();
-  };
 }
 
-function onbBack() {
-  if (state.onb.step > 0) {
-    state.onb.step--;
-    $('#onb-back').style.display = '';
-    renderOnbStep();
-  } else {
-    showScreen('scr-login');
-  }
+function togglePwd() {
+  const p = document.getElementById('inp-pwd');
+  p.type = p.type === 'password' ? 'text' : 'password';
 }
 
-async function loadAppData() {
-  if (CONFIG.DEMO_MODE) {
-    state.balance = DEMO.balance;
-    state.reserved = DEMO.reserved;
-    state.card = DEMO.card;
-    state.transactions = DEMO.transactions;
-    state.favorites = DEMO.favorites;
-    state.chart = DEMO.chart;
-  } else {
-    const [bal, tx, cards] = await Promise.all([API.balance(), API.tx(), API.cards()]);
-    state.balance = bal.available;
-    state.reserved = bal.reserved;
-    state.card = cards[0];
-    state.transactions = tx;
-    state.favorites = DEMO.favorites;
-    state.chart = bal.chart || DEMO.chart;
-  }
+function checkStrength(val) {
+  state.data.password = val;
+  const b1 = document.getElementById('bar-1');
+  const b2 = document.getElementById('bar-2');
+  const b3 = document.getElementById('bar-3');
+  
+  b1.className = 'strength-bar'; b2.className = 'strength-bar'; b3.className = 'strength-bar';
+  
+  if (val.length === 0) return;
+  
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
+
+  if (score === 1) { b1.classList.add('active', 'weak'); }
+  else if (score === 2) { b1.classList.add('active', 'medium'); b2.classList.add('active', 'medium'); }
+  else if (score === 3) { b1.classList.add('active', 'strong'); b2.classList.add('active', 'strong'); b3.classList.add('active', 'strong'); }
 }
 
-/* ============ RENDER APP ============ */
-function txHTML(t) {
-  const isIn = t.type === 'in';
-  const icon = isIn
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
-  const sign = isIn ? '+' : '−';
-  const d = new Date(t.date);
-  const dstr = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + ' • ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  return `
-    <div class="tx" data-txid="${t.id}">
-      <div class="tx-ico ${t.type}">${icon}</div>
-      <div class="tx-body"><strong>${t.title}</strong><small>${t.sub} • ${dstr}</small></div>
-      <div class="tx-amount ${t.type}">${sign} ${brl(t.amount)}</div>
-    </div>`;
+/* ============================================================
+   ETAPA 7: REVISÃO
+   ============================================================ */
+function renderReview(c) {
+  c.innerHTML = `
+    <h2 class="title">Tudo certo?</h2>
+    <p class="subtitle">Revise seus dados antes de enviar.</p>
+    
+    <div class="review-card">
+      <div class="review-row"><span>Nome</span><strong>${state.data.name}</strong></div>
+      <div class="review-row"><span>CPF</span><strong>${state.data.cpf}</strong></div>
+      <div class="review-row"><span>Nascimento</span><strong>${state.data.birthdate.split('-').reverse().join('/')}</strong></div>
+      <div class="review-row"><span>E-mail</span><strong>${state.data.email}</strong></div>
+      <div class="review-row"><span>Telefone</span><strong>(${state.data.ddd}) ${state.data.phone}</strong></div>
+    </div>
+    
+    <div class="review-card">
+      <div class="review-row"><span>CEP</span><strong>${state.data.cep}</strong></div>
+      <div class="review-row"><span>Endereço</span><strong>${state.data.address}, ${state.data.addressNum}</strong></div>
+      <div class="review-row"><span>Bairro</span><strong>${state.data.neighborhood}</strong></div>
+      <div class="review-row"><span>Cidade/UF</span><strong>${state.data.city} - ${state.data.uf}</strong></div>
+    </div>
+
+    <label style="display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--text-dim); margin:16px 0; cursor:pointer;">
+      <input type="checkbox" id="chk-terms" onchange="state.data.terms = this.checked" style="margin-top:2px; width:18px; height:18px;">
+      <span>Declaro que as informações são verdadeiras e aceito os <a href="#" style="color:var(--blue-500);">Termos de Uso</a>.</span>
+    </label>
+    <div class="error-msg" id="err-terms" style="margin-bottom:16px;">Você precisa aceitar os termos.</div>
+
+    <button class="btn btn-primary" id="btn-submit" onclick="nextStep()">Enviar solicitação</button>
+  `;
 }
 
-function renderHome() {
-  const u = state.user;
-  $('#home-avatar').textContent = u.name.charAt(0).toUpperCase();
-  $('#home-name').textContent = u.name.split(' ')[0];
-  $('#home-hi').textContent = getGreeting() + ',';
-  $('#home-balance').textContent = state.showBalance ? brl(state.balance) : 'R$ ••••••';
-  $('#home-balance').classList.toggle('hidden', !state.showBalance);
-  $('#home-reserved').textContent = state.showBalance ? brl(state.reserved) : 'R$ ••••';
-  $('#home-card-num').textContent = `•••• •••• •••• ${state.card.last4}`;
-  $('#home-card-name').textContent = state.card.titular;
-  $('#home-tx').innerHTML = state.transactions.slice(0,5).map(txHTML).join('');
-  renderChart();
-}
+/* ============================================================
+   VALIDAÇÕES GERAIS E SUBMIT
+   ============================================================ */
+function validateCurrentStep() {
+  const config = stepsConfig[state.step];
+  let isValid = true;
 
-function renderChart() {
-  const c = state.chart;
-  const svg = $('#chart');
-  if (!svg || !c) return;
-  const W=340,H=120,padB=18,padT=6;
-  const barW=12,gap=(W - c.in.length*barW*2)/(c.in.length+1);
-  const maxV=Math.max(...c.in,...c.out,1);
-  const usableH=H-padB-padT;
-  let items='';
-  c.in.forEach((vin,i) => {
-    const xIn=gap+i*(barW*2+gap);
-    const xOut=xIn+barW+2;
-    const hIn=(vin/maxV)*usableH;
-    const hOut=(c.out[i]/maxV)*usableH;
-    items+=`<rect x="${xIn}" y="${padT+usableH-hIn}" width="${barW}" height="${hIn}" rx="3" fill="var(--success)" opacity=".85"/>`;
-    items+=`<rect x="${xOut}" y="${padT+usableH-hOut}" width="${barW}" height="${hOut}" rx="3" fill="var(--blue-500)" opacity=".85"/>`;
-    items+=`<text x="${xIn+barW}" y="${H-4}" font-size="9" text-anchor="middle" fill="var(--text-mute)">${c.labels[i]}</text>`;
-  });
-  svg.innerHTML = items;
-}
-
-function renderCards() {
-  const c = state.card;
-  $('#tab-card-num').textContent = `•••• •••• •••• ${c.last4}`;
-  $('#tab-card-exp').textContent = state.showCardData ? c.exp : '••/••';
-  $('#tab-card-cvv').textContent = state.showCardData ? c.cvv : '•••';
-  const cardTx = state.transactions.filter(t => /compra|recarga/i.test(t.title));
-  $('#card-tx').innerHTML = cardTx.map(txHTML).join('') || '<p style="color:var(--text-dim);font-size:13px;padding:12px 0">Nenhuma compra recente.</p>';
-}
-
-function renderPix() {
-  $('#pix-favs').innerHTML = state.favorites.map(f =>
-    `<button class="fav" data-fav="${f.name}"><div class="fav-av">${f.initial}</div><span>${f.name}</span></button>`
-  ).join('');
-  const pixTx = state.transactions.filter(t => /pix/i.test(t.title));
-  $('#pix-tx').innerHTML = pixTx.slice(0,6).map(txHTML).join('') || '<p style="color:var(--text-dim);font-size:13px;padding:12px 0">Nenhum Pix ainda.</p>';
-}
-
-function renderExtrato() {
-  const filtered = state.transactions.filter(t => state.filter === 'all' || t.type === state.filter);
-  const groups = {};
-  filtered.forEach(t => {
-    const d = new Date(t.date);
-    const key = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    (groups[key] = groups[key] || []).push(t);
-  });
-  const html = Object.entries(groups).map(([date, list]) => `
-    <div class="date-group"><h5>${date}</h5><div class="tx-list">${list.map(txHTML).join('')}</div></div>
-  `).join('') || '<p style="color:var(--text-dim);font-size:13px;text-align:center;padding:32px 0">Nenhuma movimentação encontrada.</p>';
-  $('#extrato-groups').innerHTML = html;
-}
-
-function renderPerfil() {
-  const u = state.user;
-  $('#profile-av').textContent = u.name.charAt(0).toUpperCase();
-  $('#profile-name').textContent = u.name;
-  $('#profile-email').textContent = u.email;
-}
-
-function renderAll() {
-  renderHome(); renderCards(); renderPix(); renderExtrato(); renderPerfil();
-}
-
-/* ============ BIND APP ============ */
-let appBound = false;
-function bindApp() {
-  if (appBound) return;
-  appBound = true;
-
-  $$('.nav-item').forEach(n => n.onclick = () => setTab(n.dataset.tab));
-  $$('[data-jump]').forEach(a => a.onclick = e => { e.preventDefault(); setTab(a.dataset.jump); });
-
-  $('#btn-eye').onclick = () => { state.showBalance = !state.showBalance; renderHome(); };
-  $('#btn-notif').onclick = () => showToast('Você tem 2 notificações novas');
-
-  $$('.qa').forEach(b => b.onclick = () => {
-    const map = { pix:()=>setTab('pix'), add:()=>showToast('Abrindo depósito…'), pay:()=>showToast('Abrindo pagamentos…'), transfer:()=>showToast('Abrindo transferência…') };
-    (map[b.dataset.action] || (()=>{}))();
-  });
-
-  $('#btn-reveal-card').onclick = () => {
-    state.showCardData = !state.showCardData;
-    renderCards();
-    if (state.showCardData) {
-      clearTimeout(window._hideCard);
-      window._hideCard = setTimeout(() => { state.showCardData = false; renderCards(); }, 10000);
+  if (config.id === 'personal') {
+    if (state.data.name.trim().split(' ').length < 2) { showErr('err-name'); isValid = false; }
+    if (state.data.cpf.length !== 14) { showErr('err-cpf'); isValid = false; }
+    if (!state.data.birthdate) { showErr('err-birth'); isValid = false; }
+    else {
+      const age = new Date().getFullYear() - new Date(state.data.birthdate).getFullYear();
+      if (age < 18) { showErr('err-birth'); isValid = false; }
     }
-  };
+  }
 
-  $$('.act-item').forEach(a => a.onclick = () => {
-    const k = a.dataset.act;
-    if (k === 'block') { state.cardBlocked = !state.cardBlocked; a.querySelector('small').textContent = state.cardBlocked ? 'Bloqueado' : 'Cartão ativo'; showToast(state.cardBlocked ? 'Cartão bloqueado' : 'Cartão desbloqueado'); }
-    else if (k === 'second') showToast('2ª via solicitada — chega em 7 dias úteis');
-    else if (k === 'limits') showToast('Abrindo ajuste de limites…');
-    else if (k === 'pwd') showToast('Abrindo alteração de senha…');
-  });
+  if (config.id === 'contact') {
+    if (!state.data.email.includes('@')) { showErr('err-email'); isValid = false; }
+    if (state.data.ddd.length < 2 || state.data.phone.length < 8) { showErr('err-phone'); isValid = false; }
+  }
 
-  $$('[data-switch]').forEach(sw => sw.onclick = () => {
-    sw.classList.toggle('on');
-    const label = {online:'Compras online',nfc:'Aproximação',intl:'Compras internacionais'}[sw.dataset.switch];
-    showToast(label + (sw.classList.contains('on') ? ' ativado' : ' desativado'));
-  });
+  if (config.id === 'address') {
+    if (state.data.cep.replace(/\D/g,'').length !== 8) { showErr('err-cep'); isValid = false; }
+  }
 
-  $$('[data-pix]').forEach(p => p.onclick = () => showToast('Pix ' + p.dataset.pix + ' (disponível no Módulo 2)'));
-  $$('[data-fav]').forEach(f => f.onclick = () => showToast('Enviar Pix para ' + f.dataset.fav + ' (Módulo 2)'));
+  if (config.id === 'document') {
+    if (!state.data.docFront) { alert('Envie a frente do documento.'); isValid = false; }
+  }
 
-  $$('[data-filter]').forEach(f => f.onclick = () => {
-    $$('[data-filter]').forEach(x => x.classList.remove('active'));
-    f.classList.add('active');
-    state.filter = f.dataset.filter;
-    renderExtrato();
-  });
+  if (config.id === 'selfie') {
+    if (!state.data.selfie) { alert('Tire a selfie para continuar.'); isValid = false; }
+  }
 
-  document.addEventListener('click', e => {
-    const txEl = e.target.closest('.tx');
-    if (!txEl) return;
-    const t = state.transactions.find(x => x.id === txEl.dataset.txid);
-    if (!t) return;
-    const isIn = t.type === 'in';
-    toggleModal(`
-      <div class="modal-grip"></div>
-      <h3 style="text-align:center;font-size:26px;margin-top:8px;color:${isIn?'var(--success)':'var(--text)'};letter-spacing:-.5px">${isIn?'+':'−'} ${brl(t.amount)}</h3>
-      <p style="text-align:center;margin-bottom:18px">${t.title}</p>
-      <div class="detail-row"><span>${isIn?'Origem':'Destino'}</span><strong>${t.sub}</strong></div>
-      <div class="detail-row"><span>Data</span><strong>${new Date(t.date).toLocaleString('pt-BR')}</strong></div>
-      <div class="detail-row"><span>Status</span><strong style="text-transform:capitalize">${t.status}</strong></div>
-      <div class="detail-row"><span>ID</span><strong style="font-size:11px;font-family:monospace">${t.id}</strong></div>
-      <button class="btn btn-ghost" style="margin-top:16px" onclick="toggleModal(null)">Fechar</button>
-      <button class="btn btn-primary" onclick="showToast('Comprovante PDF gerado')">Baixar comprovante</button>
-    `);
-  });
+  if (config.id === 'password') {
+    const pwd = document.getElementById('inp-pwd').value;
+    const confirm = document.getElementById('inp-pwd-confirm').value;
+    if (pwd.length < 8) { alert('A senha deve ter no mínimo 8 caracteres.'); isValid = false; }
+    if (pwd !== confirm) { showErr('err-pwd'); isValid = false; }
+  }
 
-  $$('[data-menu]').forEach(m => m.onclick = () => {
-    const a = m.dataset.menu;
-    if (a === 'logout') {
-      toggleModal(`
-        <div class="modal-grip"></div>
-        <h3>Sair da conta?</h3>
-        <p>Você poderá entrar novamente quando quiser.</p>
-        <button class="btn btn-primary" style="background:var(--danger)" id="confirm-logout">Sair</button>
-        <button class="btn btn-ghost" onclick="toggleModal(null)">Cancelar</button>
-      `);
-      $('#confirm-logout').onclick = () => {
-        toggleModal(null);
-        state.user = null; appBound = false;
-        showScreen('scr-login');
-      };
-      return;
-    }
-    if (a === 'theme') return cycleTheme();
-    if (a === 'dados') return showToast('Dados pessoais (Módulo 2)');
-    if (a === 'security') return showToast('Segurança (Módulo 2)');
-    if (a === 'notif') return showToast('Notificações (Módulo 2)');
-    if (a === 'help') return showToast('Abrindo chat de suporte…');
-  });
+  if (config.id === 'review') {
+    if (!state.data.terms) { showErr('err-terms'); isValid = false; }
+  }
 
-  $('#modal-overlay').onclick = e => { if (e.target.id === 'modal-overlay') toggleModal(null); };
+  return isValid;
 }
 
-window.toggleModal = toggleModal;
-window.showToast = showToast;
-
-/* ============ BOOT ============ */
-async function boot() {
-  applyTheme();
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (state.theme === 'auto') applyTheme();
-  });
-  await new Promise(r => setTimeout(r, 1400));
-  showScreen('scr-login');
-  bindLogin();
-  $('#onb-back').onclick = onbBack;
+function showErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'block';
+  // Limpa erro após 3s
+  setTimeout(() => { if (el) el.style.display = 'none'; }, 3000);
 }
 
-boot();
+/* ============================================================
+   SUCESSO
+   ============================================================ */
+function submitApplication() {
+  const btn = document.getElementById('btn-submit');
+  btn.innerHTML = '<div style="width:20px;height:20px;border:3px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>';
+  btn.disabled = true;
+
+  // Simula requisição ao backend
+  setTimeout(() => {
+    const protocol = 'NX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    document.getElementById('app-header').classList.add('hidden');
+    
+    const c = document.getElementById('app-content');
+    c.innerHTML = `
+      <div class="success-screen pop-in">
+        <div class="check-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h1 class="title" style="margin-bottom:8px;">Solicitação enviada!</h1>
+        <p class="subtitle" style="margin-bottom:24px;">Sua conta está em análise. Avisaremos quando estiver aprovada.</p>
+        
+        <div class="protocol-badge">${protocol}</div>
+        <p style="font-size:12px; color:var(--text-mute);">Guarde este número de protocolo.</p>
+        
+        <button class="btn btn-outline" style="margin-top:auto; width:100%;" onclick="location.reload()">Voltar ao início</button>
+      </div>
+    `;
+  }, 2000);
+}
 </script>
 </body>
 </html>
