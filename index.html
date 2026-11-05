@@ -2,939 +2,838 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<meta name="theme-color" content="#0A2540" />
-<title>Nexo — Abertura de Conta</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meu Banco — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50:'#f5f3ff',100:'#ede9fe',200:'#ddd6fe',300:'#c4b5fd',
+            400:'#a78bfa',500:'#8b5cf6',600:'#7c3aed',700:'#6d28d9',
+            800:'#5b21b6',900:'#4c1d95'
+          }
+        },
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+      }
+    }
+  }
+</script>
 <style>
-/* ============================================================
-   DESIGN SYSTEM (Baseado em Tailwind / Fintech Premium)
-   ============================================================ */
-:root {
-  --navy-900: #04101F;
-  --navy-700: #0A2540;
-  --navy-500: #163A6B;
-  --blue-500: #1E62F0;
-  --blue-100: #E5EDFF;
-  --bg: #F8FAFC;
-  --surface: #FFFFFF;
-  --text: #0A2540;
-  --text-dim: #64748B;
-  --text-mute: #94A3B8;
-  --border: #E2E8F0;
-  --success: #12B76A;
-  --danger: #F04438;
-  --warn: #F79009;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-  --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  height: 100dvh;
-}
-
-#app {
-  width: 100%;
-  max-width: 480px;
-  background: var(--surface);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 40px rgba(0,0,0,0.05);
-}
-
-/* ============================================================
-   ANIMAÇÕES
-   ============================================================ */
-.fade-in { animation: fadeIn 0.4s ease-out forwards; }
-.slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.slide-out { animation: slideOut 0.3s ease-in forwards; }
-.pop-in { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
-@keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes drawCheck { to { stroke-dashoffset: 0; } }
-
-/* ============================================================
-   COMPONENTES UI
-   ============================================================ */
-.header {
-  padding: 24px 24px 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  z-index: 10;
-}
-.btn-back {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: transparent;
-  display: grid; place-items: center;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.btn-back:active { background: var(--bg); transform: scale(0.95); }
-.btn-back svg { width: 20px; height: 20px; color: var(--text); }
-
-.progress-container { flex: 1; }
-.progress-text {
-  font-size: 12px; font-weight: 600; color: var(--text-dim);
-  margin-bottom: 8px; display: flex; justify-content: space-between;
-}
-.progress-bar {
-  height: 4px; background: var(--border); border-radius: 4px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; background: var(--blue-500); width: 0%;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.content {
-  flex: 1; padding: 12px 24px 24px;
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
-  display: flex; flex-direction: column;
-}
-
-.title { font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
-.subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
-
-.input-group { margin-bottom: 16px; position: relative; }
-.input-group label {
-  display: block; font-size: 13px; font-weight: 600; color: var(--text-dim);
-  margin-bottom: 6px;
-}
-.input-wrapper {
-  position: relative; display: flex; align-items: center;
-}
-.input-wrapper svg.ico {
-  position: absolute; left: 16px; width: 20px; height: 20px; color: var(--text-mute);
-  pointer-events: none; transition: var(--transition);
-}
-.input-wrapper input, .input-wrapper select {
-  width: 100%; padding: 16px;
-  border: 1.5px solid var(--border); border-radius: var(--radius);
-  font-size: 16px; color: var(--text); background: var(--surface);
-  transition: var(--transition); outline: none;
-  font-family: 'Inter', sans-serif; font-weight: 500;
-  appearance: none;
-}
-/* Quando tem ícone, adiciona padding extra na esquerda */
-.input-wrapper.has-icon input, .input-wrapper.has-icon select {
-  padding-left: 48px;
-}
-.input-wrapper input::placeholder { color: var(--text-mute); font-weight: 400; }
-.input-wrapper input:focus, .input-wrapper select:focus {
-  border-color: var(--blue-500);
-  box-shadow: 0 0 0 4px rgba(30, 98, 240, 0.1);
-}
-.input-wrapper input:focus + svg.ico { color: var(--blue-500); }
-.input-wrapper.error input { border-color: var(--danger); }
-.error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
-
-.row { display: flex; gap: 12px; }
-.row > .input-group { flex: 1; }
-
-.btn {
-  width: 100%; padding: 16px; border-radius: var(--radius);
-  font-size: 16px; font-weight: 600; cursor: pointer;
-  transition: var(--transition); border: none;
-  display: flex; justify-content: center; align-items: center; gap: 8px;
-  font-family: 'Inter', sans-serif; margin-top: auto;
-}
-.btn:active { transform: scale(0.98); }
-.btn-primary { background: var(--navy-700); color: white; }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-primary:hover { background: var(--navy-900); }
-.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
-.btn-outline:hover { background: var(--bg); }
-.btn svg { width: 20px; height: 20px; }
-
-/* Tela de boas vindas */
-.welcome-screen {
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  height: 100%; text-align: center; padding: 24px;
-  background: var(--navy-700); color: white; position: absolute; inset: 0; z-index: 50;
-}
-.welcome-logo {
-  width: 80px; height: 80px; background: white; border-radius: 20px;
-  display: grid; place-items: center; margin-bottom: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: var(--navy-700);
-}
-.welcome-logo svg { width: 40px; height: 40px; }
-.welcome-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; }
-.welcome-subtitle { font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 48px; line-height: 1.5; }
-.welcome-actions { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
-.welcome-actions .btn-primary { background: white; color: var(--navy-700); }
-.welcome-actions .btn-outline { border-color: rgba(255,255,255,0.3); color: white; }
-
-/* Uploads simulados */
-.upload-box {
-  border: 2px dashed var(--border); border-radius: var(--radius-lg);
-  padding: 32px 16px; text-align: center; cursor: pointer;
-  transition: var(--transition); background: var(--bg);
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  margin-bottom: 16px; position: relative; overflow: hidden;
-}
-.upload-box:active { border-color: var(--blue-500); background: var(--blue-100); }
-.upload-box svg.upload-icon { width: 32px; height: 32px; color: var(--blue-500); }
-.upload-box span.upload-title { font-size: 14px; font-weight: 600; color: var(--text); }
-.upload-box small { font-size: 12px; color: var(--text-dim); }
-.upload-box input[type="file"] { display: none; }
-.upload-preview { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius); display: none; margin-top: 12px; z-index: 2; }
-
-/* Estado de Loading no Upload */
-.upload-box.loading { border-color: var(--blue-500); background: var(--blue-100); pointer-events: none; }
-.upload-box.loading .upload-icon, .upload-box.loading .upload-title, .upload-box.loading small, .upload-box.loading .upload-preview { opacity: 0; }
-.upload-box.loading::after {
-  content: ''; position: absolute; top: 50%; left: 50%;
-  width: 32px; height: 32px; margin: -16px 0 0 -16px;
-  border: 3px solid var(--blue-500); border-top-color: transparent;
-  border-radius: 50%; animation: spin 1s linear infinite;
-}
-.upload-box.loading::before {
-  content: 'Analisando documento...'; position: absolute;
-  bottom: 24px; left: 0; width: 100%; text-align: center;
-  font-size: 12px; font-weight: 600; color: var(--blue-500);
-}
-
-/* Estado de Sucesso no Upload */
-.upload-box.success { border-color: var(--success); border-style: solid; background: rgba(18,183,106,0.05); pointer-events: none; }
-.upload-box.success .upload-icon { color: var(--success); }
-.upload-box.success::before {
-  content: 'Documento verificado!'; position: absolute;
-  top: 50%; left: 50%; transform: translate(-50%, -50%);
-  font-size: 14px; font-weight: 700; color: var(--success); z-index: 3;
-  background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 8px;
-}
-
-/* Câmera / Selfie */
-.camera-sim {
-  width: 100%; aspect-ratio: 3/4; background: #000; border-radius: var(--radius-lg);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: relative; overflow: hidden; margin-bottom: 16px;
-}
-.camera-oval {
-  width: 65%; aspect-ratio: 3/4; border: 3px solid rgba(255,255,255,0.5);
-  border-radius: 50%; position: absolute; top: 15%;
-  box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
-}
-.camera-sim.loading::after {
-  content: ''; position: absolute; top: 50%; left: 50%;
-  width: 40px; height: 40px; margin: -20px 0 0 -20px;
-  border: 4px solid var(--blue-500); border-top-color: transparent;
-  border-radius: 50%; animation: spin 1s linear infinite; z-index: 20;
-}
-
-/* Medidor de senha */
-.password-strength { display: flex; gap: 4px; margin-top: 8px; height: 4px; }
-.strength-bar { flex: 1; background: var(--border); border-radius: 4px; transition: var(--transition); }
-.strength-bar.active.weak { background: var(--danger); }
-.strength-bar.active.medium { background: var(--warn); }
-.strength-bar.active.strong { background: var(--success); }
-
-/* Revisão */
-.review-card { background: var(--bg); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-.review-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-.review-row:last-child { border-bottom: none; }
-.review-row span { color: var(--text-dim); }
-.review-row strong { font-weight: 600; text-align: right; max-width: 60%; }
-
-/* Sucesso */
-.success-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
-.check-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(18,183,106,0.1); display: grid; place-items: center; margin-bottom: 24px; }
-.check-circle svg { width: 40px; height: 40px; stroke: var(--success); stroke-dasharray: 50; stroke-dashoffset: 50; animation: drawCheck 1s ease-out forwards; }
-.protocol-badge { background: var(--bg); border: 1px solid var(--border); padding: 12px 24px; border-radius: 100px; font-size: 16px; font-weight: 700; margin: 16px 0; letter-spacing: 1px; }
-
-/* Utilitários */
-.hidden { display: none !important; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  body { font-family:'Inter',sans-serif; background:#f8fafc; }
+  .gradient-bg { background: linear-gradient(135deg,#6d28d9 0%,#4f46e5 50%,#0ea5e9 100%); }
+  .gradient-card { background: linear-gradient(135deg,#5b21b6 0%,#7c3aed 45%,#4f46e5 100%); }
+  .card-hover { transition: all .25s ease; }
+  .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -12px rgba(109,40,217,.25); }
+  .shortcut { transition: transform .15s ease, box-shadow .2s ease, background .2s ease; }
+  .shortcut:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(109,40,217,.35); }
+  .shortcut:active { transform: scale(.94); }
+  .fade-in { animation: fadeIn .5s ease both; }
+  .slide-up { animation: slideUp .55s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)} 50%{box-shadow:0 0 0 8px rgba(239,68,68,0)} }
+  .notif-badge { animation: pulse-dot 2s infinite; }
+  .skeleton { background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation: shimmer 1.4s infinite; border-radius:8px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .custom-scroll::-webkit-scrollbar { width:6px; height:6px; }
+  .custom-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+  .side-active { background:linear-gradient(90deg,#ede9fe 0%,#f5f3ff 100%); color:#6d28d9; position:relative; }
+  .side-active::before { content:''; position:absolute; left:0; top:6px; bottom:6px; width:3px; background:#6d28d9; border-radius:0 3px 3px 0; }
+  .chart-container { position:relative; height:280px; }
+  .card-credit { background: linear-gradient(135deg,#312e81 0%,#6d28d9 55%,#1e1b4b 100%); position:relative; overflow:hidden; }
+  .card-credit::after { content:''; position:absolute; top:-40%; right:-20%; width:280px; height:280px; background: radial-gradient(circle, rgba(255,255,255,.16) 0%, transparent 65%); border-radius:50%; }
+  .card-credit::before { content:''; position:absolute; bottom:-40%; left:-10%; width:220px; height:220px; background: radial-gradient(circle, rgba(14,165,233,.30) 0%, transparent 65%); border-radius:50%; }
+  .row-new { animation: newRow 1s ease both; }
+  @keyframes newRow { from { background:#ede9fe; opacity:0; transform:translateY(-6px) } to { background:transparent; opacity:1; transform:translateY(0) } }
+  .pulse-green { animation: pulseGreen 1.6s ease; }
+  @keyframes pulseGreen { 0%{background:#dcfce7} 100%{background:transparent} }
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
 </style>
 </head>
-<body>
-<div id="app">
-  <!-- TELA DE BOAS VINDAS -->
-  <div class="welcome-screen fade-in" id="screen-welcome">
-    <div class="welcome-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
-    </div>
-    <h1 class="welcome-title">Abra sua conta</h1>
-    <p class="welcome-subtitle">Sua nova conta digital gratuita, segura e pronta em minutos.</p>
-    
-    <div class="welcome-actions">
-      <button class="btn btn-primary" onclick="startOnboarding()">Começar agora</button>
-      <button class="btn btn-outline" onclick="alert('Redirecionando para login...')">Já tenho uma conta</button>
-    </div>
-    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 24px;">
-      Ao continuar você aceita nossos <br> 
-      <a href="#" style="color:white; text-decoration: underline;">Termos de Uso</a> e <a href="#" style="color:white; text-decoration: underline;">Política de Privacidade</a>.
-    </p>
-  </div>
+<body class="text-slate-800">
 
-  <!-- HEADER -->
-  <div class="header hidden" id="app-header">
-    <button class="btn-back" onclick="prevStep()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+<!-- ===================== SIDEBAR DESKTOP ===================== -->
+<aside class="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 fixed h-screen z-30">
+  <div class="p-6 flex items-center gap-3 border-b border-slate-100">
+    <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shadow-md shadow-brand-500/30">
+      <i data-lucide="landmark" class="w-5 h-5 text-white"></i>
+    </div>
+    <div>
+      <h1 class="font-extrabold text-slate-900 leading-tight">Meu Banco</h1>
+      <p class="text-[11px] text-slate-500">Sua conta digital</p>
+    </div>
+  </div>
+  <nav class="flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scroll">
+    <a href="#" class="side-active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold"><i data-lucide="home" class="w-4 h-4"></i>Início</a>
+    <a href="#" data-action="Pix" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="zap" class="w-4 h-4"></i>Pix</a>
+    <a href="#" data-action="Transferir" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="send" class="w-4 h-4"></i>Transferir</a>
+    <a href="#" data-action="Cartões" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="credit-card" class="w-4 h-4"></i>Cartões</a>
+    <a href="#" data-action="Extrato" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="receipt" class="w-4 h-4"></i>Extrato</a>
+    <a href="#" data-action="Pagamentos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="barcode" class="w-4 h-4"></i>Pagamentos</a>
+    <a href="#" data-action="Recarga" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="smartphone" class="w-4 h-4"></i>Recarga</a>
+    <a href="#" data-action="Investimentos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="trending-up" class="w-4 h-4"></i>Investimentos</a>
+    <div class="pt-3 mt-3 border-t border-slate-100">
+      <a href="#" data-action="Perfil" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="user" class="w-4 h-4"></i>Perfil</a>
+      <a href="#" data-action="Configurações" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="settings" class="w-4 h-4"></i>Configurações</a>
+      <a href="#" data-action="Ajuda" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="help-circle" class="w-4 h-4"></i>Ajuda</a>
+    </div>
+  </nav>
+  <div class="p-3 border-t border-slate-100">
+    <button data-action="Sair" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition">
+      <i data-lucide="log-out" class="w-4 h-4"></i>Sair
     </button>
-    <div class="progress-container">
-      <div class="progress-text">
-        <span id="step-name">Dados Pessoais</span>
-        <span id="step-counter">Passo 1 de 7</span>
+  </div>
+</aside>
+
+<!-- ===================== MAIN ===================== -->
+<main class="lg:ml-64 pb-28 lg:pb-10">
+
+  <!-- TOPBAR -->
+  <header class="sticky top-0 z-20 glass border-b border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 py-3 flex items-center gap-3">
+      <div class="lg:hidden flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center">
+          <i data-lucide="landmark" class="w-4 h-4 text-white"></i>
+        </div>
+        <span class="font-extrabold text-slate-900">Meu Banco</span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
+
+      <div class="hidden lg:block">
+        <p class="text-sm text-slate-500">Olá, seja bem-vindo(a)!</p>
+        <h2 class="font-bold text-slate-900 leading-tight">Olá, Cliente 👋</h2>
+      </div>
+
+      <div class="flex-1"></div>
+
+      <button data-action="Pesquisar" class="p-2.5 rounded-lg hover:bg-slate-100 transition" aria-label="Pesquisar">
+        <i data-lucide="search" class="w-5 h-5 text-slate-600"></i>
+      </button>
+
+      <div class="relative">
+        <button id="bellBtn" class="p-2.5 rounded-lg hover:bg-slate-100 transition relative" aria-label="Notificações">
+          <i data-lucide="bell" class="w-5 h-5 text-slate-600"></i>
+          <span id="notifBadge" class="notif-badge absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+        </button>
+
+        <!-- Painel de notificações -->
+        <div id="notifPanel" class="hidden absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden slide-up">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-sm">Notificações</h3>
+            <button id="markAllBtn" class="text-xs text-brand-600 font-semibold hover:underline">Marcar todas como lidas</button>
+          </div>
+          <div id="notifList" class="max-h-80 overflow-y-auto custom-scroll divide-y divide-slate-100"></div>
+        </div>
+      </div>
+
+      <div class="relative">
+        <button id="avatarBtn" class="w-10 h-10 rounded-full gradient-bg text-white font-bold flex items-center justify-center shadow-md shadow-brand-500/30 hover:opacity-90 transition" aria-label="Perfil">C</button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden slide-up">
+          <div class="p-4 border-b border-slate-100">
+            <p class="font-bold text-sm">Cliente Exemplo</p>
+            <p class="text-xs text-slate-500">cliente@meubanco.com</p>
+          </div>
+          <div class="py-1">
+            <a href="#" data-action="Meu perfil" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"><i data-lucide="user" class="w-4 h-4 text-slate-500"></i>Meu perfil</a>
+            <a href="#" data-action="Dados da conta" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"><i data-lucide="wallet" class="w-4 h-4 text-slate-500"></i>Dados da conta</a>
+            <a href="#" data-action="Segurança" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"><i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i>Segurança</a>
+            <a href="#" data-action="Configurações" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"><i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>Configurações</a>
+            <a href="#" data-action="Ajuda" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"><i data-lucide="help-circle" class="w-4 h-4 text-slate-500"></i>Ajuda</a>
+          </div>
+          <div class="border-t border-slate-100">
+            <button data-action="Sair" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"><i data-lucide="log-out" class="w-4 h-4"></i>Sair</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- CONTEÚDO DINÂMICO -->
-  <div class="content hidden" id="app-content"></div>
-</div>
+  <!-- CONTEÚDO -->
+  <div class="max-w-7xl mx-auto px-4 lg:px-8 pt-6">
+
+    <!-- SKELETON -->
+    <div id="loadingSkeleton" class="space-y-6">
+      <div class="skeleton h-44 w-full rounded-2xl"></div>
+      <div class="grid grid-cols-4 lg:grid-cols-8 gap-3">
+        <div class="skeleton h-20"></div><div class="skeleton h-20"></div>
+        <div class="skeleton h-20"></div><div class="skeleton h-20"></div>
+        <div class="skeleton h-20"></div><div class="skeleton h-20"></div>
+        <div class="skeleton h-20"></div><div class="skeleton h-20"></div>
+      </div>
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 skeleton h-64"></div>
+        <div class="skeleton h-64"></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardContent" class="hidden space-y-6">
+
+      <!-- HERO / SALDO -->
+      <section class="grid lg:grid-cols-3 gap-6 fade-in">
+        <div class="lg:col-span-2 gradient-card rounded-2xl p-6 lg:p-7 text-white shadow-xl shadow-brand-600/20 relative overflow-hidden">
+          <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5"></div>
+          <div class="absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-white/5"></div>
+
+          <div class="relative">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-white/70 font-semibold">Saldo disponível</p>
+                <div class="flex items-center gap-3 mt-1">
+                  <h3 id="balanceValue" class="text-3xl lg:text-4xl font-extrabold tracking-tight">R$ 8.450,90</h3>
+                  <button id="toggleBalance" class="p-1.5 rounded-lg hover:bg-white/15 transition" aria-label="Ocultar saldo">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                  </button>
+                </div>
+                <p class="text-[11px] text-white/70 mt-1 flex items-center gap-1">
+                  <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                  Atualizado agora · <span id="lastUpdate">agora mesmo</span>
+                </p>
+              </div>
+              <div class="hidden sm:flex flex-col items-end gap-1">
+                <span class="text-[10px] uppercase tracking-wider text-white/70 font-semibold">Conta</span>
+                <span class="text-sm font-semibold">Ag. 0001 · CC 12345-6</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-6 relative">
+              <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                <div class="flex items-center gap-2 text-white/80 text-xs">
+                  <i data-lucide="arrow-down-left" class="w-4 h-4 text-emerald-300"></i>
+                  Entradas no mês
+                </div>
+                <p class="text-lg font-bold mt-1 text-emerald-300" id="entradaMes">+ R$ 4.200,00</p>
+              </div>
+              <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                <div class="flex items-center gap-2 text-white/80 text-xs">
+                  <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-300"></i>
+                  Saídas no mês
+                </div>
+                <p class="text-lg font-bold mt-1 text-rose-300" id="saidaMes">− R$ 1.750,00</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 mt-5 flex-wrap">
+              <button data-action="Ver extrato" class="bg-white text-brand-700 text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-50 transition">Ver extrato</button>
+              <button data-action="Pix" class="bg-white/15 backdrop-blur text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-white/25 transition">Fazer Pix</button>
+              <button data-action="Saldo bloqueado" class="bg-white/10 backdrop-blur text-white/90 text-xs font-medium px-4 py-2 rounded-lg hover:bg-white/20 transition">
+                <i data-lucide="lock" class="w-3 h-3 inline -mt-0.5"></i> Bloqueado: R$ 0,00
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartão de crédito -->
+        <div class="card-credit rounded-2xl p-6 text-white shadow-xl shadow-indigo-900/30 card-hover flex flex-col justify-between min-h-[220px]">
+          <div class="relative flex items-start justify-between">
+            <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold">MEU BANCO</span>
+            <i data-lucide="wifi" class="w-5 h-5 text-white/80 rotate-90"></i>
+          </div>
+          <div class="relative mt-4">
+            <div class="w-10 h-7 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-inner"></div>
+          </div>
+          <div class="relative mt-3">
+            <p class="text-lg font-mono tracking-widest">•••• •••• •••• 4821</p>
+            <div class="flex items-end justify-between mt-3">
+              <div>
+                <p class="text-[9px] uppercase tracking-widest text-white/60">Titular</p>
+                <p class="text-sm font-semibold">CLIENTE EXEMPLO</p>
+              </div>
+              <span class="text-lg font-extrabold italic tracking-tight">VISA</span>
+            </div>
+          </div>
+          <button data-action="Gerenciar cartões" class="relative mt-4 text-xs font-semibold bg-white/15 backdrop-blur rounded-lg py-2 hover:bg-white/25 transition">
+            Gerenciar cartões
+          </button>
+        </div>
+      </section>
+
+      <!-- ATALHOS RÁPIDOS -->
+      <section class="fade-in">
+        <h3 class="text-sm font-bold text-slate-700 mb-3">Atalhos rápidos</h3>
+        <div class="grid grid-cols-4 sm:grid-cols-8 gap-3">
+          <button data-action="Pix" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="zap" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Pix</span>
+          </button>
+          <button data-action="Transferir" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center"><i data-lucide="send" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Transferir</span>
+          </button>
+          <button data-action="Depositar" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center"><i data-lucide="arrow-down-to-line" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Depositar</span>
+          </button>
+          <button data-action="Pagar" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="barcode" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Pagar</span>
+          </button>
+          <button data-action="Cartões" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="credit-card" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Cartões</span>
+          </button>
+          <button data-action="Extrato" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center"><i data-lucide="receipt" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Extrato</span>
+          </button>
+          <button data-action="Recarga" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center"><i data-lucide="smartphone" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Recarga</span>
+          </button>
+          <button data-action="Ajuda" class="shortcut bg-white rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-slate-200">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center"><i data-lucide="help-circle" class="w-5 h-5"></i></span>
+            <span class="text-[11px] font-semibold text-slate-700">Ajuda</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- GRID PRINCIPAL -->
+      <div class="grid lg:grid-cols-3 gap-6">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="lg:col-span-2 space-y-6">
+
+          <!-- ÚLTIMAS MOVIMENTAÇÕES -->
+          <section class="bg-white rounded-2xl border border-slate-200 p-5 fade-in">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-bold text-slate-900">Últimas movimentações</h3>
+                <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Atualizado automaticamente
+                </p>
+              </div>
+              <button data-action="Ver extrato completo" class="text-xs font-semibold text-brand-600 hover:underline flex items-center gap-1">
+                Ver extrato <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div id="txList" class="divide-y divide-slate-100"></div>
+            <div id="txEmpty" class="hidden text-center py-8">
+              <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
+                <i data-lucide="inbox" class="w-6 h-6 text-slate-400"></i>
+              </div>
+              <p class="mt-3 text-sm font-semibold text-slate-700">Nenhuma movimentação ainda</p>
+              <p class="text-xs text-slate-500">Suas transações aparecerão aqui.</p>
+            </div>
+          </section>
+
+          <!-- GRÁFICO -->
+          <section class="bg-white rounded-2xl border border-slate-200 p-5 fade-in">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-bold text-slate-900">Visão financeira</h3>
+                <p class="text-xs text-slate-500">Entradas e saídas do período</p>
+              </div>
+              <div class="flex gap-1 bg-slate-100 rounded-lg p-1 text-[11px] font-semibold flex-wrap">
+                <button data-period="7d" class="chart-period-btn px-2.5 py-1.5 rounded-md bg-white text-brand-700 shadow-sm">7 dias</button>
+                <button data-period="15d" class="chart-period-btn px-2.5 py-1.5 rounded-md text-slate-600">15 dias</button>
+                <button data-period="30d" class="chart-period-btn px-2.5 py-1.5 rounded-md text-slate-600">30 dias</button>
+                <button data-period="mes" class="chart-period-btn px-2.5 py-1.5 rounded-md text-slate-600">Este mês</button>
+                <button data-period="prev" class="chart-period-btn px-2.5 py-1.5 rounded-md text-slate-600">Mês anterior</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+              <div class="bg-emerald-50 rounded-xl p-2.5">
+                <p class="text-[10px] uppercase font-bold text-emerald-700">Entradas</p>
+                <p id="chartEntrada" class="text-sm font-extrabold text-emerald-700">R$ 4.200,00</p>
+              </div>
+              <div class="bg-rose-50 rounded-xl p-2.5">
+                <p class="text-[10px] uppercase font-bold text-rose-700">Saídas</p>
+                <p id="chartSaida" class="text-sm font-extrabold text-rose-700">R$ 1.750,00</p>
+              </div>
+              <div class="bg-brand-50 rounded-xl p-2.5">
+                <p class="text-[10px] uppercase font-bold text-brand-700">Saldo</p>
+                <p id="chartSaldo" class="text-sm font-extrabold text-brand-700">R$ 2.450,00</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="finChart"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <!-- COLUNA DIREITA -->
+        <div class="space-y-6">
+
+          <!-- NOTIFICAÇÕES -->
+          <section class="bg-white rounded-2xl border border-slate-200 p-5 fade-in">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-slate-900">Notificações</h3>
+              <span id="unreadCount" class="text-[11px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">3 novas</span>
+            </div>
+            <div id="notifSideList" class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1"></div>
+          </section>
+
+          <!-- OFERTAS -->
+          <section class="space-y-3 fade-in">
+            <h3 class="text-sm font-bold text-slate-700">Para você</h3>
+
+            <div class="bg-gradient-to-br from-brand-600 to-indigo-700 text-white rounded-2xl p-5 card-hover cursor-pointer" data-action="Cartão virtual">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-white/70 font-bold">Novidade</p>
+                  <h4 class="font-extrabold text-lg mt-1 leading-tight">Cartão virtual<br>na hora</h4>
+                  <p class="text-xs text-white/80 mt-1">Compre online com mais segurança.</p>
+                </div>
+                <i data-lucide="credit-card" class="w-8 h-8 text-white/70"></i>
+              </div>
+              <button class="mt-3 text-xs font-bold bg-white/20 backdrop-blur px-3 py-1.5 rounded-lg hover:bg-white/30 transition">Conhecer</button>
+            </div>
+
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-5 card-hover cursor-pointer" data-action="Segurança da conta">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-white/80 font-bold">Proteção</p>
+                  <h4 class="font-extrabold text-lg mt-1 leading-tight">Sua conta<br>mais segura</h4>
+                  <p class="text-xs text-white/85 mt-1">Ative a verificação em duas etapas.</p>
+                </div>
+                <i data-lucide="shield-check" class="w-8 h-8 text-white/80"></i>
+              </div>
+              <button class="mt-3 text-xs font-bold bg-white/20 backdrop-blur px-3 py-1.5 rounded-lg hover:bg-white/30 transition">Ativar</button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 flex items-center gap-3 card-hover cursor-pointer" data-action="Benefícios">
+              <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="gift" class="w-5 h-5"></i></span>
+              <div class="flex-1">
+                <p class="text-sm font-bold text-slate-900">Benefícios exclusivos</p>
+                <p class="text-[11px] text-slate-500">Conheça as vantagens da sua conta</p>
+              </div>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <p class="text-center text-[11px] text-slate-400 pt-4">
+        Demonstração visual · Dados simulados · Meu Banco © 2025
+      </p>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== BOTTOM NAV MOBILE ===================== -->
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 z-30">
+  <div class="grid grid-cols-5 py-1.5">
+    <button data-action="Início" class="flex flex-col items-center gap-0.5 py-1 text-brand-600">
+      <i data-lucide="home" class="w-5 h-5"></i><span class="text-[10px] font-semibold">Início</span>
+    </button>
+    <button data-action="Pix" class="flex flex-col items-center gap-0.5 py-1 text-slate-500">
+      <i data-lucide="zap" class="w-5 h-5"></i><span class="text-[10px] font-medium">Pix</span>
+    </button>
+    <button data-action="Cartões" class="flex flex-col items-center gap-0.5 py-1 text-slate-500">
+      <i data-lucide="credit-card" class="w-5 h-5"></i><span class="text-[10px] font-medium">Cartões</span>
+    </button>
+    <button data-action="Extrato" class="flex flex-col items-center gap-0.5 py-1 text-slate-500">
+      <i data-lucide="receipt" class="w-5 h-5"></i><span class="text-[10px] font-medium">Extrato</span>
+    </button>
+    <button data-action="Perfil" class="flex flex-col items-center gap-0.5 py-1 text-slate-500">
+      <i data-lucide="user" class="w-5 h-5"></i><span class="text-[10px] font-medium">Perfil</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===================== TOASTS ===================== -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <script>
-/* ============================================================
-   ESTADO GLOBAL E CONFIGURAÇÃO
-   ============================================================ */
+/* =====================================================
+   ESTADO SIMULADO (substituir por chamadas reais)
+===================================================== */
 const state = {
-  step: 0,
-  data: {
-    name: '', cpf: '', birthdate: '', nationality: 'Brasileira', country: 'Brasil',
-    email: '', phone: '',
-    cep: '', address: '', addressNum: '', addressComp: '', neighborhood: '', city: '', uf: '',
-    docType: '', docFront: false, docBack: false,
-    selfie: false,
-    password: '',
-    terms: false
-  }
+  balance: 8450.90,
+  hidden: false,
+  entradaMes: 4200.00,
+  saidaMes: 1750.00,
+  transactions: [
+    { id:1, type:'in',  icon:'arrow-down-left',  color:'emerald', title:'Pix recebido', desc:'João Silva', date:'Hoje, 10:42', amount: 250.00, status:'Concluído' },
+    { id:2, type:'out', icon:'shopping-bag',     color:'rose',    title:'Compra no cartão', desc:'Mercado Central', date:'Hoje, 09:15', amount: -89.90, status:'Concluído' },
+    { id:3, type:'out', icon:'arrow-up-right',   color:'rose',    title:'Pix enviado', desc:'Maria Souza', date:'Ontem, 18:30', amount: -50.00, status:'Concluído' },
+    { id:4, type:'in',  icon:'arrow-down-left',  color:'emerald', title:'TED recebida', desc:'Empresa XYZ Ltda', date:'Ontem, 08:00', amount: 1800.00, status:'Concluído' },
+    { id:5, type:'out', icon:'smartphone',       color:'cyan',    title:'Recarga de celular', desc:'Vivo · (11) 9****-1234', date:'20/11, 15:22', amount: -30.00, status:'Concluído' },
+  ],
+  notifications: [
+    { id:1, icon:'zap',            color:'emerald', title:'Pix recebido',         desc:'Você recebeu R$ 250,00 de João Silva.',  time:'10:42', read:false },
+    { id:2, icon:'shield-alert',   color:'amber',   title:'Compra suspeita',      desc:'Verificamos uma compra e bloqueamos por segurança.', time:'09:50', read:false },
+    { id:3, icon:'credit-card',    color:'brand',   title:'Cartão virtual criado', desc:'Seu novo cartão virtual está pronto para uso.', time:'ontem', read:false },
+    { id:4, icon:'check-circle',   color:'emerald', title:'Compra aprovada',      desc:'Mercado Central · R$ 89,90.', time:'ontem', read:true },
+    { id:5, icon:'info',           color:'sky',     title:'Atualização cadastral', desc:'Mantenha seus dados sempre atualizados.', time:'20/11', read:true },
+  ]
 };
 
-const stepsConfig = [
-  { id: 'personal', name: 'Dados Pessoais' },
-  { id: 'contact', name: 'Contatos' },
-  { id: 'address', name: 'Endereço' },
-  { id: 'document', name: 'Documentos' },
-  { id: 'selfie', name: 'Reconhecimento' },
-  { id: 'password', name: 'Segurança' },
-  { id: 'review', name: 'Revisão' }
-];
+/* =====================================================
+   FORMATAÇÃO
+===================================================== */
+const fmtBRL = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
 
-/* ============================================================
-   CONTROLE DE NAVEGAÇÃO
-   ============================================================ */
-function startOnboarding() {
-  document.getElementById('screen-welcome').classList.add('hidden');
-  document.getElementById('app-header').classList.remove('hidden');
-  document.getElementById('app-content').classList.remove('hidden');
-  state.step = 0;
-  renderStep();
+/* =====================================================
+   HELPERS
+===================================================== */
+function $(sel){ return document.querySelector(sel); }
+function $$(sel){ return document.querySelectorAll(sel); }
+function icon(name, cls='w-4 h-4'){ return `<i data-lucide="${name}" class="${cls}"></i>`; }
+
+const colorMap = {
+  emerald: 'bg-emerald-50 text-emerald-600',
+  rose:    'bg-rose-50 text-rose-600',
+  cyan:    'bg-cyan-50 text-cyan-600',
+  brand:   'bg-brand-50 text-brand-600',
+  amber:   'bg-amber-50 text-amber-600',
+  sky:     'bg-sky-50 text-sky-600',
+  indigo:  'bg-indigo-50 text-indigo-600',
+};
+
+/* =====================================================
+   TOAST
+===================================================== */
+function toast(message, type='info'){
+  const colors = {
+    info:    'bg-slate-900',
+    success: 'bg-emerald-600',
+    error:   'bg-rose-600',
+    warn:    'bg-amber-600',
+  };
+  const icons = { info:'info', success:'check-circle', error:'alert-circle', warn:'alert-triangle' };
+  const el = document.createElement('div');
+  el.className = `${colors[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 slide-up pointer-events-auto max-w-xs`;
+  el.innerHTML = icon(icons[type],'w-4 h-4 shrink-0') + `<span>${message}</span>`;
+  $('#toastContainer').appendChild(el);
+  lucide.createIcons();
+  setTimeout(() => { el.style.opacity='0'; el.style.transform='translateY(-8px)'; el.style.transition='all .3s'; }, 3200);
+  setTimeout(() => el.remove(), 3600);
 }
 
-function updateHeader() {
-  const config = stepsConfig[state.step];
-  document.getElementById('step-name').textContent = config.name;
-  document.getElementById('step-counter').textContent = `Passo ${state.step + 1} de ${stepsConfig.length}`;
-  const pct = ((state.step + 1) / stepsConfig.length) * 100;
-  document.getElementById('progress-fill').style.width = `${pct}%`;
-}
-
-function prevStep() {
-  if (state.step > 0) {
-    state.step--;
-    renderStep();
+/* =====================================================
+   AÇÃO GERAL (atalhos / menus)
+===================================================== */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.getAttribute('data-action');
+  if (action === 'Sair') { toast('Sessão encerrada (simulação).', 'info'); return; }
+  const emBreve = ['Pix','Transferir','Depositar','Pagar','Cartões','Extrato','Recarga','Ajuda','Pesquisar','Pagamentos','Investimentos','Configurações','Perfil'];
+  if (emBreve.includes(action)) {
+    toast(`"${action}" estará disponível em breve. Este é um ambiente de demonstração.`, 'warn');
   } else {
-    document.getElementById('screen-welcome').classList.remove('hidden');
-    document.getElementById('app-header').classList.add('hidden');
-    document.getElementById('app-content').classList.add('hidden');
+    toast(`Abrindo: ${action} (simulação)`, 'info');
+  }
+});
+
+/* =====================================================
+   TOGGLE BALANCE
+===================================================== */
+$('#toggleBalance').addEventListener('click', () => {
+  state.hidden = !state.hidden;
+  renderBalance();
+  $('#toggleBalance').innerHTML = icon(state.hidden ? 'eye-off' : 'eye', 'w-5 h-5');
+  lucide.createIcons();
+});
+
+function renderBalance(){
+  const el = $('#balanceValue');
+  if (state.hidden){
+    el.textContent = 'R$ ••••••';
+    el.classList.add('balance-hidden');
+  } else {
+    el.textContent = fmtBRL.format(state.balance);
+    el.classList.remove('balance-hidden');
   }
 }
 
-function nextStep() {
-  if (validateCurrentStep()) {
-    if (state.step < stepsConfig.length - 1) {
-      state.step++;
-      renderStep();
-    } else {
-      submitApplication();
-    }
+/* =====================================================
+   ANIMATED COUNTER
+===================================================== */
+function animateValue(el, start, end, duration=900, prefix='', formatter=null){
+  const startTime = performance.now();
+  function frame(now){
+    const t = Math.min((now-startTime)/duration, 1);
+    const eased = 1 - Math.pow(1-t, 3);
+    const current = start + (end-start)*eased;
+    el.textContent = formatter ? formatter(current) : (prefix + fmtBRL.format(current));
+    if (t < 1) requestAnimationFrame(frame);
   }
+  requestAnimationFrame(frame);
 }
 
-/* ============================================================
-   RENDERIZAÇÃO DAS TELAS
-   ============================================================ */
-function renderStep() {
-  updateHeader();
-  const container = document.getElementById('app-content');
-  
-  container.classList.remove('slide-in');
-  container.classList.add('slide-out');
-  
-  setTimeout(() => {
-    container.innerHTML = '';
-    const config = stepsConfig[state.step];
-    
-    if (config.id === 'personal') renderPersonal(container);
-    if (config.id === 'contact') renderContact(container);
-    if (config.id === 'address') renderAddress(container);
-    if (config.id === 'document') renderDocument(container);
-    if (config.id === 'selfie') renderSelfie(container);
-    if (config.id === 'password') renderPassword(container);
-    if (config.id === 'review') renderReview(container);
-
-    container.classList.remove('slide-out');
-    container.classList.add('slide-in');
-    container.scrollTop = 0;
-  }, 300);
-}
-
-/* ============================================================
-   ETAPA 1: DADOS PESSOAIS
-   ============================================================ */
-function renderPersonal(c) {
-  c.innerHTML = `
-    <h2 class="title">Seus dados</h2>
-    <p class="subtitle">Precisamos dessas informações para criar sua conta.</p>
-    
-    <div class="input-group">
-      <label>Nome completo</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <input type="text" id="inp-name" placeholder="Ex: João da Silva" value="${state.data.name}" oninput="state.data.name = this.value">
-      </div>
-      <div class="error-msg" id="err-name">Informe seu nome completo.</div>
-    </div>
-
-    <div class="input-group">
-      <label>CPF</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h5"/></svg>
-        <input type="tel" id="inp-cpf" placeholder="000.000.000-00" maxlength="14" value="${state.data.cpf}" oninput="maskCPF(this)">
-      </div>
-      <div class="error-msg" id="err-cpf">CPF inválido.</div>
-    </div>
-
-    <div class="input-group">
-      <label>Data de nascimento</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <input type="date" id="inp-birth" value="${state.data.birthdate}" onchange="state.data.birthdate = this.value">
-      </div>
-      <div class="error-msg" id="err-birth">Você precisa ter 18 anos ou mais.</div>
-    </div>
-
-    <div class="row">
-      <div class="input-group">
-        <label>Nacionalidade</label>
-        <div class="input-wrapper">
-          <select onchange="state.data.nationality = this.value">
-            <option value="Brasileira" ${state.data.nationality === 'Brasileira' ? 'selected' : ''}>Brasileira</option>
-            <option value="Portuguesa">Portuguesa</option>
-          </select>
-        </div>
-      </div>
-      <div class="input-group">
-        <label>País</label>
-        <div class="input-wrapper">
-          <select onchange="state.data.country = this.value">
-            <option value="Brasil" ${state.data.country === 'Brasil' ? 'selected' : ''}>Brasil</option>
-            <option value="Portugal">Portugal</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
-  `;
-}
-
-function maskCPF(input) {
-  let v = input.value.replace(/\D/g, '');
-  if (v.length > 11) v = v.slice(0, 11);
-  v = v.replace(/(\d{3})(\d)/, '$1.$2');
-  v = v.replace(/(\d{3})(\d)/, '$1.$2');
-  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  input.value = v;
-  state.data.cpf = v;
-}
-
-/* ============================================================
-   ETAPA 2: CONTATOS (TELEFONE CORRIGIDO)
-   ============================================================ */
-function renderContact(c) {
-  c.innerHTML = `
-    <h2 class="title">Como podemos falar com você?</h2>
-    <p class="subtitle">Enviaremos um código para confirmar seus dados.</p>
-    
-    <div class="input-group">
-      <label>E-mail</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <input type="email" id="inp-email" placeholder="voce@email.com" value="${state.data.email}" oninput="state.data.email = this.value">
-      </div>
-      <div class="error-msg" id="err-email">Digite um e-mail válido.</div>
-    </div>
-
-    <div class="input-group">
-      <label>Celular</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
-        <input type="tel" id="inp-phone" placeholder="(11) 99999-9999" maxlength="15" value="${state.data.phone}" oninput="maskPhone(this)">
-      </div>
-      <div class="error-msg" id="err-phone">Celular inválido. Digite DDD + número.</div>
-    </div>
-
-    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
-  `;
-}
-
-function maskPhone(input) {
-  let v = input.value.replace(/\D/g, '');
-  if (v.length > 11) v = v.slice(0, 11);
-  
-  if (v.length > 10) {
-    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-  } else if (v.length > 6) {
-    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-  } else if (v.length > 2) {
-    v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-  } else if (v.length > 0) {
-    v = v.replace(/^(\d*)/, '($1');
+/* =====================================================
+   RENDER TRANSAÇÕES
+===================================================== */
+function renderTx(){
+  const list = $('#txList');
+  const empty = $('#txEmpty');
+  if (state.transactions.length === 0){
+    list.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
   }
-  
-  input.value = v;
-  state.data.phone = v;
-}
-
-/* ============================================================
-   ETAPA 3: ENDEREÇO (VIA CEP)
-   ============================================================ */
-function renderAddress(c) {
-  c.innerHTML = `
-    <h2 class="title">Onde você mora?</h2>
-    <p class="subtitle">Precisamos do seu endereço residencial.</p>
-    
-    <div class="input-group">
-      <label>CEP</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <input type="tel" id="inp-cep" placeholder="00000-000" maxlength="9" value="${state.data.cep}" oninput="maskCEP(this)" onblur="fetchCEP()">
-      </div>
-      <div class="error-msg" id="err-cep">CEP inválido.</div>
-      <div id="cep-loading" style="display:none; font-size:12px; color:var(--blue-500); margin-top:4px;">Buscando endereço...</div>
-    </div>
-
-    <div class="input-group">
-      <label>Rua / Logradouro</label>
-      <div class="input-wrapper">
-        <input type="text" id="inp-address" placeholder="Av. Paulista" value="${state.data.address}" oninput="state.data.address = this.value">
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="input-group">
-        <label>Número</label>
-        <div class="input-wrapper">
-          <input type="text" id="inp-addressNum" placeholder="123" value="${state.data.addressNum}" oninput="state.data.addressNum = this.value">
+  empty.classList.add('hidden');
+  list.innerHTML = state.transactions.slice(0,5).map(tx => {
+    const isIn = tx.amount >= 0;
+    const sign = isIn ? '+' : '−';
+    const amountColor = isIn ? 'text-emerald-600' : 'text-rose-600';
+    const bgColor = colorMap[tx.color] || colorMap.brand;
+    const statusClass = tx.status === 'Concluído'
+      ? 'bg-emerald-50 text-emerald-700'
+      : tx.status === 'Pendente'
+        ? 'bg-amber-50 text-amber-700'
+        : 'bg-slate-100 text-slate-600';
+    return `
+      <div class="py-3 flex items-center gap-3" data-action="Detalhes: ${tx.title}">
+        <div class="w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center shrink-0">
+          ${icon(tx.icon, 'w-5 h-5')}
         </div>
-      </div>
-      <div class="input-group">
-        <label>Complemento</label>
-        <div class="input-wrapper">
-          <input type="text" placeholder="Apto 45" value="${state.data.addressComp}" oninput="state.data.addressComp = this.value">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-900 truncate">${tx.title}</p>
+          <p class="text-[11px] text-slate-500 truncate">${tx.date} · ${tx.desc}</p>
         </div>
-      </div>
-    </div>
-
-    <div class="input-group">
-      <label>Bairro</label>
-      <div class="input-wrapper">
-        <input type="text" id="inp-neighborhood" placeholder="Bela Vista" value="${state.data.neighborhood}" oninput="state.data.neighborhood = this.value">
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="input-group" style="flex: 2;">
-        <label>Cidade</label>
-        <div class="input-wrapper">
-          <input type="text" id="inp-city" placeholder="São Paulo" value="${state.data.city}" oninput="state.data.city = this.value">
+        <div class="text-right">
+          <p class="text-sm font-bold ${amountColor}">${sign} ${fmtBRL.format(Math.abs(tx.amount))}</p>
+          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${statusClass}">${tx.status}</span>
         </div>
-      </div>
-      <div class="input-group" style="flex: 1;">
-        <label>UF</label>
-        <div class="input-wrapper">
-          <input type="text" id="inp-uf" placeholder="SP" maxlength="2" value="${state.data.uf}" oninput="state.data.uf = this.value">
-        </div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
-  `;
-}
-
-function maskCEP(input) {
-  let v = input.value.replace(/\D/g, '');
-  if (v.length > 8) v = v.slice(0, 8);
-  v = v.replace(/(\d{5})(\d)/, '$1-$2');
-  input.value = v;
-  state.data.cep = v;
-}
-
-async function fetchCEP() {
-  const cep = state.data.cep.replace(/\D/g, '');
-  if (cep.length !== 8) return;
-  
-  document.getElementById('cep-loading').style.display = 'block';
-  try {
-    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const data = await res.json();
-    if (!data.erro) {
-      document.getElementById('inp-address').value = data.logradouro;
-      document.getElementById('inp-neighborhood').value = data.bairro;
-      document.getElementById('inp-city').value = data.localidade;
-      document.getElementById('inp-uf').value = data.uf;
-      
-      state.data.address = data.logradouro;
-      state.data.neighborhood = data.bairro;
-      state.data.city = data.localidade;
-      state.data.uf = data.uf;
-      
-      document.getElementById('inp-addressNum').focus();
-    }
-  } catch (e) {
-    console.error('Erro ao buscar CEP');
-  } finally {
-    document.getElementById('cep-loading').style.display = 'none';
-  }
-}
-
-/* ============================================================
-   ETAPA 4: DOCUMENTOS (SIMULAÇÃO DE ANÁLISE OCR)
-   ============================================================ */
-function renderDocument(c) {
-  c.innerHTML = `
-    <h2 class="title">Envie seu documento</h2>
-    <p class="subtitle">Escolha um documento oficial com foto.</p>
-    
-    <div class="input-group">
-      <label>Tipo de documento</label>
-      <div class="input-wrapper">
-        <select id="sel-docType" onchange="state.data.docType = this.value">
-          <option value="">Selecione...</option>
-          <option value="RG">RG</option>
-          <option value="CNH">CNH</option>
-        </select>
-      </div>
-      <div class="error-msg" id="err-doctype">Selecione o tipo de documento.</div>
-    </div>
-
-    <div class="upload-box" id="box-front" onclick="triggerUpload('front')">
-      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span class="upload-title">Frente do documento</span>
-      <small>Tire uma foto nítida, sem reflexos.</small>
-      <img id="preview-front" class="upload-preview" src="" alt="Frente">
-      <input type="file" id="file-front" accept="image/*" onchange="simulateUpload(this, 'front')">
-    </div>
-
-    <div class="upload-box" id="box-back" onclick="triggerUpload('back')">
-      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span class="upload-title">Verso do documento</span>
-      <small>Necessário para alguns documentos.</small>
-      <img id="preview-back" class="upload-preview" src="" alt="Verso">
-      <input type="file" id="file-back" accept="image/*" onchange="simulateUpload(this, 'back')">
-    </div>
-
-    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
-  `;
-}
-
-function triggerUpload(side) {
-  // Se já foi enviado, não faz nada
-  if (state.data[side === 'front' ? 'docFront' : 'docBack'] === 'success') return;
-  document.getElementById(`file-${side}`).click();
-}
-
-function simulateUpload(input, side) {
-  const box = document.getElementById(`box-${side}`);
-  const preview = document.getElementById(`preview-${side}`);
-  const file = input.files[0];
-
-  // Se o usuário cancelar a câmera, não faz nada
-  if (!file) return;
-
-  // Mostra preview se for imagem
-  if (file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // Efeito visual de Loading (simula OCR)
-  box.classList.add('loading');
-
-  setTimeout(() => {
-    box.classList.remove('loading');
-    box.classList.add('success');
-    
-    // Salva no estado que foi enviado com sucesso
-    if (side === 'front') state.data.docFront = 'success';
-    if (side === 'back') state.data.docBack = 'success';
-  }, 2000); // 2 segundos de "análise"
-}
-
-/* ============================================================
-   ETAPA 5: SELFIE (SIMULAÇÃO DE PROVA DE VIDA)
-   ============================================================ */
-function renderSelfie(c) {
-  c.innerHTML = `
-    <h2 class="title">Reconhecimento Facial</h2>
-    <p class="subtitle">Vamos tirar uma selfie para confirmar que é você.</p>
-    
-    <div class="camera-sim" id="camera-area">
-      <div class="camera-oval" id="camera-oval"></div>
-      <svg id="camera-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:48px;height:48px;z-index:10;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      <p id="camera-text" style="color:white; z-index:10; margin-top: 16px; font-size: 14px; text-align:center;">Posicione seu rosto<br>dentro da moldura</p>
-    </div>
-
-    <input type="file" id="file-selfie" accept="image/*" capture="user" style="display:none" onchange="simulateSelfie(this)">
-
-    <button class="btn btn-outline" id="btn-camera" onclick="document.getElementById('file-selfie').click()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Abrir Câmera
-    </button>
-
-    <button class="btn btn-primary" style="margin-top:16px;" onclick="nextStep()">Continuar</button>
-  `;
-}
-
-function simulateSelfie(input) {
-  if (!input.files || !input.files[0]) return;
-
-  const cameraArea = document.getElementById('camera-area');
-  const cameraText = document.getElementById('camera-text');
-  const btn = document.getElementById('btn-camera');
-
-  // Simula o loading de comparação facial
-  cameraArea.classList.add('loading');
-  cameraText.innerHTML = 'Analisando biometria...';
-  btn.classList.add('hidden');
-
-  setTimeout(() => {
-    cameraArea.classList.remove('loading');
-    cameraArea.innerHTML = `
-      <img src="${URL.createObjectURL(input.files[0])}" style="width:100%;height:100%;object-fit:cover;">
-      <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(18,183,106,0.9); color:white; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>
-        Rosto verificado
       </div>
     `;
-    state.data.selfie = true;
-  }, 2000);
+  }).join('');
+  lucide.createIcons();
 }
 
-/* ============================================================
-   ETAPA 6: SENHA
-   ============================================================ */
-function renderPassword(c) {
-  c.innerHTML = `
-    <h2 class="title">Crie sua senha</h2>
-    <p class="subtitle">Ela será usada para acessar sua conta.</p>
-    
-    <div class="input-group">
-      <label>Senha</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input type="password" id="inp-pwd" placeholder="Digite sua senha" oninput="checkStrength(this.value)">
-        <button onclick="togglePwd()" style="position:absolute;right:16px;background:none;border:none;cursor:pointer;padding:8px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--text-mute);"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
+/* =====================================================
+   RENDER NOTIFICAÇÕES
+===================================================== */
+function renderNotifs(){
+  const unread = state.notifications.filter(n => !n.read).length;
+
+  // Badge topbar
+  const badge = $('#notifBadge');
+  if (unread === 0){ badge.classList.add('hidden'); }
+  else { badge.classList.remove('hidden'); badge.textContent = unread; }
+
+  // Contador lateral
+  const unreadEl = $('#unreadCount');
+  if (unread === 0){ unreadEl.textContent = 'Tudo em dia'; unreadEl.className = 'text-[11px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full'; }
+  else { unreadEl.textContent = `${unread} nova${unread>1?'s':''}`; unreadEl.className = 'text-[11px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full'; }
+
+  // Painel dropdown
+  $('#notifList').innerHTML = state.notifications.map(n => `
+    <div class="p-3 flex items-start gap-3 ${n.read ? 'bg-white' : 'bg-brand-50/40'}">
+      <div class="w-8 h-8 rounded-lg ${colorMap[n.color]} flex items-center justify-center shrink-0">
+        ${icon(n.icon,'w-4 h-4')}
       </div>
-      <div class="password-strength">
-        <div class="strength-bar" id="bar-1"></div>
-        <div class="strength-bar" id="bar-2"></div>
-        <div class="strength-bar" id="bar-3"></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-bold text-slate-900">${n.title}</p>
+        <p class="text-[11px] text-slate-500 leading-snug">${n.desc}</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">${n.time}</p>
       </div>
+      ${!n.read ? '<span class="w-2 h-2 rounded-full bg-brand-500 shrink-0 mt-1"></span>' : ''}
     </div>
+  `).join('');
 
-    <div class="input-group">
-      <label>Confirmar senha</label>
-      <div class="input-wrapper has-icon">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input type="password" id="inp-pwd-confirm" placeholder="Repita a senha">
+  // Painel lateral
+  $('#notifSideList').innerHTML = state.notifications.slice(0,4).map(n => `
+    <div class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-slate-50 transition">
+      <div class="w-8 h-8 rounded-lg ${colorMap[n.color]} flex items-center justify-center shrink-0">
+        ${icon(n.icon,'w-4 h-4')}
       </div>
-      <div class="error-msg" id="err-pwd">As senhas não coincidem ou são muito curtas.</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-semibold text-slate-900 truncate">${n.title}</p>
+        <p class="text-[10px] text-slate-500 truncate">${n.desc}</p>
+      </div>
+      ${!n.read ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0 mt-1.5"></span>' : ''}
     </div>
+  `).join('');
 
-    <button class="btn btn-primary" onclick="nextStep()">Continuar</button>
-  `;
+  lucide.createIcons();
 }
 
-function togglePwd() {
-  const p = document.getElementById('inp-pwd');
-  p.type = p.type === 'password' ? 'text' : 'password';
-}
+/* =====================================================
+   NOTIFICAÇÕES - AÇÕES
+===================================================== */
+$('#bellBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  $('#notifPanel').classList.toggle('hidden');
+  $('#avatarMenu').classList.add('hidden');
+});
+$('#markAllBtn').addEventListener('click', () => {
+  state.notifications.forEach(n => n.read = true);
+  renderNotifs();
+  toast('Todas as notificações foram marcadas como lidas.', 'success');
+});
 
-function checkStrength(val) {
-  state.data.password = val;
-  const b1 = document.getElementById('bar-1');
-  const b2 = document.getElementById('bar-2');
-  const b3 = document.getElementById('bar-3');
-  
-  b1.className = 'strength-bar'; b2.className = 'strength-bar'; b3.className = 'strength-bar';
-  
-  if (val.length === 0) return;
-  
-  let score = 0;
-  if (val.length >= 8) score++;
-  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
-  if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
+/* =====================================================
+   AVATAR MENU
+===================================================== */
+$('#avatarBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  $('#avatarMenu').classList.toggle('hidden');
+  $('#notifPanel').classList.add('hidden');
+});
 
-  if (score === 1) { b1.classList.add('active', 'weak'); }
-  else if (score === 2) { b1.classList.add('active', 'medium'); b2.classList.add('active', 'medium'); }
-  else if (score === 3) { b1.classList.add('active', 'strong'); b2.classList.add('active', 'strong'); b3.classList.add('active', 'strong'); }
-}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#notifPanel') && !e.target.closest('#bellBtn')) $('#notifPanel').classList.add('hidden');
+  if (!e.target.closest('#avatarMenu') && !e.target.closest('#avatarBtn')) $('#avatarMenu').classList.add('hidden');
+});
 
-/* ============================================================
-   ETAPA 7: REVISÃO
-   ============================================================ */
-function renderReview(c) {
-  c.innerHTML = `
-    <h2 class="title">Tudo certo?</h2>
-    <p class="subtitle">Revise seus dados antes de enviar.</p>
-    
-    <div class="review-card">
-      <div class="review-row"><span>Nome</span><strong>${state.data.name}</strong></div>
-      <div class="review-row"><span>CPF</span><strong>${state.data.cpf}</strong></div>
-      <div class="review-row"><span>Nascimento</span><strong>${state.data.birthdate.split('-').reverse().join('/')}</strong></div>
-      <div class="review-row"><span>E-mail</span><strong>${state.data.email}</strong></div>
-      <div class="review-row"><span>Telefone</span><strong>${state.data.phone}</strong></div>
-    </div>
-    
-    <div class="review-card">
-      <div class="review-row"><span>CEP</span><strong>${state.data.cep}</strong></div>
-      <div class="review-row"><span>Endereço</span><strong>${state.data.address}, ${state.data.addressNum}</strong></div>
-      <div class="review-row"><span>Bairro</span><strong>${state.data.neighborhood}</strong></div>
-      <div class="review-row"><span>Cidade/UF</span><strong>${state.data.city} - ${state.data.uf}</strong></div>
-    </div>
+/* =====================================================
+   CHART (Chart.js)
+===================================================== */
+const chartData = {
+  '7d':  { labels:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], entradas:[280,120,650,410,530,720,180], saidas:[150,220,180,260,90,310,140], totalIn:2890, totalOut:1350 },
+  '15d': { labels:Array.from({length:15},(_,i)=>`${i+1}`), entradas:[120,340,280,400,180,290,530,720,410,260,580,340,290,610,320], saidas:[80,210,150,180,90,150,260,310,140,200,180,120,240,170,110], totalIn:5680, totalOut:2490 },
+  '30d': { labels:Array.from({length:30},(_,i)=>`${i+1}`), entradas:[120,340,280,400,180,290,530,720,410,260,580,340,290,610,320,180,240,390,420,510,290,340,260,410,280,190,370,450,320,280], saidas:[80,210,150,180,90,150,260,310,140,200,180,120,240,170,110,190,140,220,180,160,120,190,150,210,180,140,220,190,160,120], totalIn:9860, totalOut:4920 },
+  'mes': { labels:['Sem 1','Sem 2','Sem 3','Sem 4'], entradas:[1200,980,1450,570], saidas:[520,410,480,340], totalIn:4200, totalOut:1750 },
+  'prev':{ labels:['Sem 1','Sem 2','Sem 3','Sem 4'], entradas:[900,1300,1100,780], saidas:[620,540,710,480], totalIn:4080, totalOut:2350 },
+};
 
-    <div class="review-card">
-      <div class="review-row"><span>Documento</span><strong>Verificado ✅</strong></div>
-      <div class="review-row"><span>Biometria</span><strong>Verificada ✅</strong></div>
-    </div>
+let currentChart = null;
+function buildChart(period){
+  const d = chartData[period];
+  const ctx = document.getElementById('finChart').getContext('2d');
+  const gradientIn = ctx.createLinearGradient(0,0,0,260);
+  gradientIn.addColorStop(0,'rgba(16,185,129,.25)');
+  gradientIn.addColorStop(1,'rgba(16,185,129,0)');
+  const gradientOut = ctx.createLinearGradient(0,0,0,260);
+  gradientOut.addColorStop(0,'rgba(244,63,94,.22)');
+  gradientOut.addColorStop(1,'rgba(244,63,94,0)');
 
-    <label style="display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--text-dim); margin:16px 0; cursor:pointer;">
-      <input type="checkbox" id="chk-terms" onchange="state.data.terms = this.checked" style="margin-top:2px; width:18px; height:18px;">
-      <span>Declaro que as informações são verdadeiras e aceito os <a href="#" style="color:var(--blue-500);">Termos de Uso</a>.</span>
-    </label>
-    <div class="error-msg" id="err-terms" style="margin-bottom:16px;">Você precisa aceitar os termos.</div>
-
-    <button class="btn btn-primary" id="btn-submit" onclick="nextStep()">Enviar solicitação</button>
-  `;
-}
-
-/* ============================================================
-   VALIDAÇÕES GERAIS E SUBMIT
-   ============================================================ */
-function validateCurrentStep() {
-  const config = stepsConfig[state.step];
-  let isValid = true;
-
-  if (config.id === 'personal') {
-    if (state.data.name.trim().split(' ').length < 2) { showErr('err-name'); isValid = false; }
-    if (state.data.cpf.length !== 14) { showErr('err-cpf'); isValid = false; }
-    if (!state.data.birthdate) { showErr('err-birth'); isValid = false; }
-    else {
-      const age = new Date().getFullYear() - new Date(state.data.birthdate).getFullYear();
-      if (age < 18) { showErr('err-birth'); isValid = false; }
+  if (currentChart) currentChart.destroy();
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: d.labels,
+      datasets: [
+        { label:'Entradas', data:d.entradas, borderColor:'#10b981', backgroundColor:gradientIn, fill:true, tension:.4, borderWidth:2.5, pointRadius:0, pointHoverRadius:5, pointHoverBackgroundColor:'#10b981' },
+        { label:'Saídas',   data:d.saidas,   borderColor:'#f43f5e', backgroundColor:gradientOut, fill:true, tension:.4, borderWidth:2.5, pointRadius:0, pointHoverRadius:5, pointHoverBackgroundColor:'#f43f5e' },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      animation:{ duration:800, easing:'easeOutQuart' },
+      plugins:{
+        legend:{ display:true, position:'top', align:'end', labels:{ boxWidth:8, boxHeight:8, usePointStyle:true, pointStyle:'circle', font:{ size:11, family:'Inter' }, color:'#64748b' } },
+        tooltip:{
+          backgroundColor:'#0f172a', padding:10, cornerRadius:8, titleFont:{ size:11 }, bodyFont:{ size:11 },
+          callbacks:{ label: (c)=> `${c.dataset.label}: ${fmtBRL.format(c.parsed.y)}` }
+        }
+      },
+      scales:{
+        x:{ grid:{ display:false }, ticks:{ color:'#94a3b8', font:{ size:10, family:'Inter' } } },
+        y:{ grid:{ color:'#f1f5f9' }, ticks:{ color:'#94a3b8', font:{ size:10, family:'Inter' }, callback:(v)=> 'R$ '+v } }
+      }
     }
-  }
+  });
 
-  if (config.id === 'contact') {
-    if (!state.data.email.includes('@')) { showErr('err-email'); isValid = false; }
-    if (state.data.phone.replace(/\D/g, '').length < 10) { showErr('err-phone'); isValid = false; }
-  }
-
-  if (config.id === 'address') {
-    if (state.data.cep.replace(/\D/g,'').length !== 8) { showErr('err-cep'); isValid = false; }
-  }
-
-  if (config.id === 'document') {
-    if (!state.data.docType) { showErr('err-doctype'); isValid = false; }
-    if (state.data.docFront !== 'success') { alert('Envie a frente do documento.'); isValid = false; }
-  }
-
-  if (config.id === 'selfie') {
-    if (!state.data.selfie) { alert('Tire a selfie para continuar.'); isValid = false; }
-  }
-
-  if (config.id === 'password') {
-    const pwd = document.getElementById('inp-pwd').value;
-    const confirm = document.getElementById('inp-pwd-confirm').value;
-    if (pwd.length < 8 || pwd !== confirm) { showErr('err-pwd'); isValid = false; }
-  }
-
-  if (config.id === 'review') {
-    if (!state.data.terms) { showErr('err-terms'); isValid = false; }
-  }
-
-  return isValid;
+  $('#chartEntrada').textContent = fmtBRL.format(d.totalIn);
+  $('#chartSaida').textContent   = fmtBRL.format(d.totalOut);
+  $('#chartSaldo').textContent   = fmtBRL.format(d.totalIn - d.totalOut);
 }
 
-function showErr(id) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = 'block';
-  setTimeout(() => { if (el) el.style.display = 'none'; }, 3000);
+$$('.chart-period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.chart-period-btn').forEach(b => { b.classList.remove('bg-white','text-brand-700','shadow-sm'); b.classList.add('text-slate-600'); });
+    btn.classList.remove('text-slate-600');
+    btn.classList.add('bg-white','text-brand-700','shadow-sm');
+    buildChart(btn.dataset.period);
+  });
+});
+
+/* =====================================================
+   SIMULAÇÃO EM TEMPO REAL
+===================================================== */
+function simulateNewTransaction(){
+  const templates = [
+    { type:'in',  icon:'arrow-down-left', color:'emerald', title:'Pix recebido',      desc:'Carlos Andrade',       amount: 180.00 },
+    { type:'out', icon:'shopping-bag',    color:'rose',    title:'Compra no cartão',   desc:'Cafeteria Bom Grão',   amount: -24.50 },
+    { type:'in',  icon:'arrow-down-left', color:'emerald', title:'Pix recebido',       desc:'Ana Beatriz',          amount: 320.00 },
+    { type:'out', icon:'arrow-up-right',  color:'rose',    title:'Pix enviado',        desc:'Pedro Henrique',       amount: -75.00 },
+  ];
+  const t = templates[Math.floor(Math.random()*templates.length)];
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  const newTx = {
+    id: Date.now(),
+    type: t.type, icon: t.icon, color: t.color,
+    title: t.title, desc: t.desc,
+    date: `Hoje, ${time}`,
+    amount: t.amount,
+    status: 'Concluído'
+  };
+
+  state.transactions.unshift(newTx);
+  if (state.transactions.length > 8) state.transactions.pop();
+
+  // Ajusta saldo e totais
+  state.balance += newTx.amount;
+  if (newTx.amount >= 0) state.entradaMes += newTx.amount;
+  else state.saidaMes += Math.abs(newTx.amount);
+
+  // Re-render
+  renderTx();
+  renderBalance();
+  $('#entradaMes').textContent = '+ ' + fmtBRL.format(state.entradaMes);
+  $('#saidaMes').textContent   = '− ' + fmtBRL.format(state.saidaMes);
+  $('#lastUpdate').textContent = 'agora mesmo';
+
+  // Nova notificação
+  state.notifications.unshift({
+    id: Date.now(),
+    icon: t.type === 'in' ? 'zap' : 'shopping-bag',
+    color: t.type === 'in' ? 'emerald' : 'rose',
+    title: t.type === 'in' ? 'Pix recebido' : 'Nova movimentação',
+    desc: `${t.desc} · ${fmtBRL.format(Math.abs(newTx.amount))}`,
+    time, read: false
+  });
+  renderNotifs();
+
+  // Toast
+  toast(
+    t.type === 'in'
+      ? `Você recebeu ${fmtBRL.format(newTx.amount)} de ${t.desc}.`
+      : `Nova transação: ${fmtBRL.format(Math.abs(newTx.amount))} em ${t.desc}.`,
+    t.type === 'in' ? 'success' : 'info'
+  );
+
+  // Destaque
+  const first = $('#txList').firstElementChild;
+  if (first) { first.classList.add('row-new'); setTimeout(()=>first.classList.remove('row-new'),1200); }
 }
 
-/* ============================================================
-   SUCESSO
-   ============================================================ */
-function submitApplication() {
-  const btn = document.getElementById('btn-submit');
-  btn.innerHTML = '<div style="width:20px;height:20px;border:3px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>';
-  btn.disabled = true;
+/* =====================================================
+   CARREGAMENTO INICIAL
+===================================================== */
+window.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
 
   setTimeout(() => {
-    const protocol = 'NX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    document.getElementById('app-header').classList.add('hidden');
-    
-    const c = document.getElementById('app-content');
-    c.innerHTML = `
-      <div class="success-screen pop-in">
-        <div class="check-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-        </div>
-        <h1 class="title" style="margin-bottom:8px;">Solicitação enviada!</h1>
-        <p class="subtitle" style="margin-bottom:24px;">Sua conta está em análise. Avisaremos quando estiver aprovada.</p>
-        
-        <div class="protocol-badge">${protocol}</div>
-        <p style="font-size:12px; color:var(--text-mute);">Guarde este número de protocolo.</p>
-        
-        <button class="btn btn-outline" style="margin-top:auto; width:100%;" onclick="location.reload()">Voltar ao início</button>
-      </div>
-    `;
-  }, 2000);
-}
+    $('#loadingSkeleton').classList.add('hidden');
+    $('#dashboardContent').classList.remove('hidden');
+
+    // Saldo animado
+    animateValue($('#balanceValue'), 0, state.balance, 1000);
+    renderTx();
+    renderNotifs();
+    buildChart('7d');
+    lucide.createIcons();
+
+    // Simula novas movimentações a cada 15 segundos
+    setTimeout(() => simulateNewTransaction(), 8000);
+    setInterval(simulateNewTransaction, 18000);
+
+    // Atualiza "última atualização"
+    let sec = 0;
+    setInterval(() => {
+      sec++;
+      if (sec < 60) $('#lastUpdate').textContent = `há ${sec}s`;
+      else $('#lastUpdate').textContent = `há ${Math.floor(sec/60)}min`;
+    }, 1000);
+
+  }, 900);
+});
 </script>
 </body>
 </html>
