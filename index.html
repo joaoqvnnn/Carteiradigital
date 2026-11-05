@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#42177D" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Nexo Wallet</title>
+<style>
+/* ============ RESET + VARS ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple-900:#2a0f52; --purple-800:#42177D; --purple-700:#5a1fa8;
+  --purple-600:#6b2fb8; --purple-500:#8B43F5; --purple-400:#a56bff;
+  --purple-300:#c9a4ff; --purple-100:#efe5ff;
+  --success:#22c55e; --danger:#ef4444; --warn:#f59e0b; --info:#3b82f6;
+  --radius:18px; --radius-sm:12px;
+  --transition:220ms cubic-bezier(.22,1,.36,1);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+[data-theme="dark"]{
+  --bg:#0f0b16; --bg-2:#17131D; --bg-elev:#1e1830;
+  --card:#1e1830; --card-2:#241d3a;
+  --text:#ffffff; --text-dim:#a39ab8; --text-mute:#6d6480;
+  --border:rgba(255,255,255,.07);
+  --shadow:0 12px 32px rgba(0,0,0,.45);
+  --shadow-sm:0 4px 12px rgba(0,0,0,.35);
+  --input-bg:rgba(255,255,255,.05);
+  --nav-bg:rgba(23,19,29,.92);
+}
+[data-theme="light"]{
+  --bg:#f4f1fa; --bg-2:#ffffff; --bg-elev:#ffffff;
+  --card:#ffffff; --card-2:#f7f4fd;
+  --text:#17131D; --text-dim:#5e566f; --text-mute:#8a8299;
+  --border:rgba(66,23,125,.09);
+  --shadow:0 12px 32px rgba(66,23,125,.10);
+  --shadow-sm:0 4px 12px rgba(66,23,125,.08);
+  --input-bg:#f4f1fa;
+  --nav-bg:rgba(255,255,255,.92);
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  transition:background var(--transition), color var(--transition);
+}
+button,input,select,textarea{font-family:inherit;color:inherit;border:none;background:none;outline:none}
+button{cursor:pointer}
+a{color:var(--purple-400);text-decoration:none}
+::-webkit-scrollbar{width:0;height:0}
+
+/* ============ APP SHELL ============ */
+#app{
+  position:relative;width:100%;height:100%;max-width:480px;margin:0 auto;
+  background:var(--bg);overflow:hidden;
+}
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;transform:translateX(24px);
+  transition:opacity var(--transition),transform var(--transition);
+  overflow:hidden;
+}
+.screen.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.screen.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ============ SPLASH ============ */
+#scr-splash{
+  background:linear-gradient(160deg,var(--purple-900),var(--purple-800) 40%,var(--purple-600));
+  align-items:center;justify-content:center;
+}
+.splash-logo{
+  width:96px;height:96px;border-radius:28px;
+  background:linear-gradient(135deg,#fff 0%,#e9d5ff 100%);
+  display:grid;place-items:center;
+  box-shadow:0 20px 60px rgba(139,67,245,.5);
+  animation:pop 700ms cubic-bezier(.22,1,.36,1);
+}
+.splash-logo svg{width:52px;height:52px;color:var(--purple-800)}
+.splash-name{margin-top:20px;color:#fff;font-size:28px;font-weight:800;letter-spacing:-.5px;animation:fadeUp .7s .2s both}
+.splash-sub{margin-top:6px;color:rgba(255,255,255,.72);font-size:13px;letter-spacing:.5px;animation:fadeUp .7s .3s both}
+.splash-loader{
+  margin-top:40px;width:36px;height:36px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.25);border-top-color:#fff;
+  animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ============ AUTH ============ */
+.auth{padding:32px 24px calc(24px + var(--safe-b));overflow-y:auto}
+.auth-head{margin-bottom:28px;margin-top:12px}
+.auth-head h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
+.auth-head p{margin-top:6px;color:var(--text-dim);font-size:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;letter-spacing:.3px}
+.field input{
+  width:100%;padding:14px 16px;border-radius:14px;
+  background:var(--input-bg);border:1.5px solid transparent;
+  font-size:15px;color:var(--text);
+  transition:border-color var(--transition),background var(--transition);
+}
+.field input:focus{border-color:var(--purple-500);background:var(--bg-elev)}
+.field input::placeholder{color:var(--text-mute)}
+.btn{
+  width:100%;padding:15px;border-radius:14px;
+  font-size:15px;font-weight:700;letter-spacing:.2px;
+  transition:transform var(--transition),filter var(--transition),opacity var(--transition);
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-700));
+  color:#fff;box-shadow:0 8px 24px rgba(139,67,245,.35);
+}
+.btn-primary:disabled{opacity:.5}
+.btn-ghost{background:var(--input-bg);color:var(--text)}
+.auth-alt{margin-top:18px;text-align:center;font-size:14px;color:var(--text-dim)}
+.auth-alt a{font-weight:700}
+.auth-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-dim);font-size:14px;margin-bottom:8px}
+.auth-back svg{width:18px;height:18px}
+.terms{margin-top:16px;font-size:11.5px;color:var(--text-mute);text-align:center;line-height:1.5}
+.terms a{color:var(--purple-400)}
+.err{color:var(--danger);font-size:12.5px;margin-top:-6px;margin-bottom:10px;display:none}
+.err.show{display:block}
+
+/* ============ APP MAIN ============ */
+#scr-app{background:var(--bg)}
+.app-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(84px + var(--safe-b))}
+.tab{display:none;padding:0 20px}
+.tab.active{display:block;animation:tabIn .3s cubic-bezier(.22,1,.36,1)}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============ HOME ============ */
+.home-head{display:flex;align-items:center;gap:12px;padding:20px 20px 4px}
+.avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-800));
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;
+}
+.home-greet{flex:1;min-width:0}
+.home-greet small{color:var(--text-dim);font-size:12px}
+.home-greet h2{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--bg-elev);display:grid;place-items:center;
+  border:1px solid var(--border);position:relative;
+  transition:transform var(--transition),background var(--transition);
+}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:20px;height:20px;color:var(--text)}
+.icon-btn .dot{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:var(--purple-400);border:1.5px solid var(--bg-elev)}
+
+/* Balance Card */
+.balance-card{
+  margin:16px 20px 0;padding:22px;border-radius:22px;
+  background:linear-gradient(135deg,var(--purple-800) 0%,var(--purple-600) 60%,var(--purple-500) 100%);
+  color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 16px 40px rgba(66,23,125,.35);
+}
+.balance-card::before{content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+.balance-card::after{content:"";position:absolute;bottom:-80px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05)}
+.bc-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.bc-label{font-size:12px;opacity:.85;letter-spacing:.3px}
+.bc-eye{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:grid;place-items:center}
+.bc-eye svg{width:18px;height:18px;color:#fff}
+.bc-balance{font-size:32px;font-weight:800;letter-spacing:-1px;margin-top:10px;position:relative;z-index:1;transition:filter .2s}
+.bc-balance.hidden-amount{filter:blur(10px)}
+.bc-reserved{margin-top:14px;display:flex;gap:16px;position:relative;z-index:1}
+.bc-reserved div{flex:1}
+.bc-reserved small{font-size:10.5px;opacity:.75;display:block;letter-spacing:.3px}
+.bc-reserved strong{font-size:14px;font-weight:700;margin-top:2px;display:block}
+
+/* Quick Actions */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 20px 0}
+.qa{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:14px 6px;border-radius:16px;
+  background:var(--bg-elev);border:1px solid var(--border);
+  transition:transform var(--transition),background var(--transition);
+}
+.qa:active{transform:scale(.95);background:var(--card-2)}
+.qa-ico{
+  width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(135deg,rgba(139,67,245,.16),rgba(139,67,245,.06));
+  display:grid;place-items:center;
+}
+.qa-ico svg{width:20px;height:20px;color:var(--purple-400)}
+.qa span{font-size:11px;font-weight:600;color:var(--text-dim);text-align:center;line-height:1.2}
+
+/* Section */
+.section{margin-top:26px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-head h3{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.section-head a{font-size:12.5px;color:var(--purple-400);font-weight:600}
+
+/* Virtual Card mini */
+.vcard{
+  aspect-ratio:1.586/1;border-radius:18px;padding:18px;color:#fff;
+  background:linear-gradient(135deg,#1a0f2e 0%,var(--purple-800) 55%,var(--purple-500) 100%);
+  position:relative;overflow:hidden;
+  box-shadow:0 12px 32px rgba(0,0,0,.35);
+}
+.vcard::before{content:"";position:absolute;top:-70px;right:-70px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%)}
+.vcard-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.vcard-brand{font-size:12px;font-weight:800;letter-spacing:1px;opacity:.85}
+.vcard-chip{width:34px;height:26px;border-radius:6px;background:linear-gradient(135deg,#f8d57a,#c9a03a);position:relative;z-index:1}
+.vcard-num{font-family:ui-monospace,Menlo,monospace;font-size:17px;letter-spacing:2px;margin-top:22px;position:relative;z-index:1}
+.vcard-num.masked{letter-spacing:4px}
+.vcard-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;position:relative;z-index:1}
+.vcard-bottom small{font-size:9px;opacity:.7;letter-spacing:.5px;display:block}
+.vcard-bottom strong{font-size:12px;font-weight:700;margin-top:2px;display:block}
+.vcard-flag{font-style:italic;font-weight:900;font-size:14px;letter-spacing:-.5px}
+
+/* Chart */
+.chart-card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.chart-legend{display:flex;gap:16px;margin-bottom:14px}
+.chart-legend span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim)}
+.chart-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.chart-legend i.in{background:var(--success)}
+.chart-legend i.out{background:var(--purple-500)}
+.chart-svg{width:100%;height:130px;display:block}
+
+/* Transaction list */
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  background:var(--card);border-radius:14px;border:1px solid var(--border);
+  transition:background var(--transition);
+}
+.tx:active{background:var(--card-2)}
+.tx-ico{
+  width:42px;height:42px;border-radius:12px;
+  display:grid;place-items:center;flex-shrink:0;
+}
+.tx-ico.in{background:rgba(34,197,94,.14)}.tx-ico.in svg{color:var(--success)}
+.tx-ico.out{background:rgba(139,67,245,.14)}.tx-ico.out svg{color:var(--purple-400)}
+.tx-ico svg{width:20px;height:20px}
+.tx-body{flex:1;min-width:0}
+.tx-body strong{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-body small{display:block;font-size:11.5px;color:var(--text-dim);margin-top:2px}
+.tx-amount{font-size:13.5px;font-weight:800;white-space:nowrap}
+.tx-amount.in{color:var(--success)}
+.tx-amount.out{color:var(--text)}
+
+/* Promo banner */
+.promo{
+  border-radius:var(--radius);padding:18px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--purple-600),var(--purple-500));
+  box-shadow:0 8px 24px rgba(139,67,245,.28);
+}
+.promo h4{font-size:15px;font-weight:800;letter-spacing:-.2px}
+.promo p{font-size:12.5px;opacity:.9;margin-top:6px;line-height:1.4}
+.promo button{margin-top:14px;padding:9px 16px;border-radius:10px;background:#fff;color:var(--purple-800);font-weight:800;font-size:12.5px}
+
+/* ============ CARDS SCREEN ============ */
+.cards-scroll-tabs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px}
+.chip-tab{padding:9px 16px;border-radius:999px;background:var(--bg-elev);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-dim);white-space:nowrap;transition:all var(--transition)}
+.chip-tab.active{background:var(--purple-500);color:#fff;border-color:var(--purple-500)}
+
+.card-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.ca{padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:10px;transition:transform var(--transition)}
+.ca:active{transform:scale(.97)}
+.ca-ico{width:36px;height:36px;border-radius:10px;background:rgba(139,67,245,.14);display:grid;place-items:center;flex-shrink:0}
+.ca-ico svg{width:18px;height:18px;color:var(--purple-400)}
+.ca div{flex:1;min-width:0}
+.ca strong{display:block;font-size:12.5px;font-weight:700}
+.ca small{display:block;font-size:11px;color:var(--text-dim);margin-top:1px}
+
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row strong{font-size:13.5px;font-weight:600;display:block}
+.toggle-row small{font-size:11.5px;color:var(--text-dim);display:block;margin-top:2px}
+.switch{width:46px;height:26px;border-radius:999px;background:var(--input-bg);position:relative;transition:background var(--transition);flex-shrink:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform var(--transition);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.switch.on{background:var(--purple-500)}
+.switch.on::after{transform:translateX(20px)}
+
+/* ============ PIX ============ */
+.pix-hero{
+  border-radius:22px;padding:22px;color:#fff;
+  background:linear-gradient(135deg,var(--purple-800),var(--purple-500));
+  position:relative;overflow:hidden;margin-top:8px;
+}
+.pix-hero::before{content:"";position:absolute;top:-60px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+.pix-hero h3{font-size:18px;font-weight:800;position:relative;z-index:1}
+.pix-hero p{font-size:12.5px;opacity:.85;margin-top:4px;position:relative;z-index:1}
+.pix-hero button{margin-top:16px;padding:11px 18px;border-radius:12px;background:#fff;color:var(--purple-800);font-weight:800;font-size:13px;position:relative;z-index:1}
+
+.pix-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.pix-opt{padding:18px 14px;border-radius:16px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;transition:transform var(--transition)}
+.pix-opt:active{transform:scale(.97)}
+.pix-opt-ico{width:42px;height:42px;border-radius:12px;background:rgba(139,67,245,.14);display:grid;place-items:center}
+.pix-opt-ico svg{width:22px;height:22px;color:var(--purple-400)}
+.pix-opt strong{font-size:13px;font-weight:700}
+.pix-opt small{font-size:11px;color:var(--text-dim);line-height:1.3}
+
+.fav-row{display:flex;gap:14px;overflow-x:auto;padding:4px 0 8px}
+.fav{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:64px}
+.fav-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--purple-500),var(--purple-800));display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px}
+.fav span{font-size:11px;color:var(--text-dim);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ============ EXTRATO ============ */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.date-group{margin-bottom:20px}
+.date-group h5{font-size:12px;font-weight:700;color:var(--text-dim);text-transform:capitalize;margin-bottom:8px;letter-spacing:.3px}
+
+/* ============ PERFIL ============ */
+.profile-head{display:flex;flex-direction:column;align-items:center;padding:16px 0 8px}
+.profile-av{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-800));
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:28px;
+  box-shadow:0 12px 32px rgba(139,67,245,.35);
+}
+.profile-head h3{margin-top:14px;font-size:19px;font-weight:800}
+.profile-head p{color:var(--text-dim);font-size:13px;margin-top:2px}
+.profile-menu{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-top:20px}
+.pm-item{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--border);transition:background var(--transition)}
+.pm-item:last-child{border-bottom:none}
+.pm-item:active{background:var(--card-2)}
+.pm-ico{width:38px;height:38px;border-radius:11px;background:rgba(139,67,245,.12);display:grid;place-items:center;flex-shrink:0}
+.pm-ico svg{width:18px;height:18px;color:var(--purple-400)}
+.pm-item div{flex:1}
+.pm-item strong{font-size:13.5px;font-weight:600;display:block}
+.pm-item small{font-size:11.5px;color:var(--text-dim);display:block;margin-top:1px}
+.pm-item > svg{width:16px;height:16px;color:var(--text-mute)}
+.pm-item.danger .pm-ico{background:rgba(239,68,68,.12)}
+.pm-item.danger .pm-ico svg{color:var(--danger)}
+.pm-item.danger strong{color:var(--danger)}
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  height:calc(64px + var(--safe-b));padding:0 8px var(--safe-b);
+  display:flex;align-items:center;justify-content:space-around;
+  background:var(--nav-bg);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);z-index:50;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;color:var(--text-mute);transition:color var(--transition);position:relative}
+.nav-item svg{width:22px;height:22px;transition:transform var(--transition)}
+.nav-item span{font-size:10px;font-weight:600;letter-spacing:.2px}
+.nav-item.active{color:var(--purple-400)}
+.nav-item.active svg{transform:translateY(-1px)}
+.nav-item.active::before{content:"";position:absolute;top:2px;width:24px;height:3px;border-radius:3px;background:var(--purple-500)}
+
+/* ============ MODAL ============ */
+.modal-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:100;
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex;animation:fadeIn .2s}
+.modal{
+  width:100%;max-width:480px;background:var(--bg-2);
+  border-radius:24px 24px 0 0;padding:24px 20px calc(24px + var(--safe-b));
+  transform:translateY(100%);animation:slideUp .3s cubic-bezier(.22,1,.36,1) forwards;
+  max-height:85%;overflow-y:auto;
+}
+.modal h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.5}
+.modal .btn{margin-top:8px}
+.modal-grip{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 16px}
+@keyframes slideUp{to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Detail rows */
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-row span{color:var(--text-dim)}
+.detail-row strong{font-weight:700;text-align:right}
+
+/* Toast */
+.toast{
+  position:absolute;top:20px;left:50%;transform:translate(-50%,-100px);
+  background:var(--purple-800);color:#fff;padding:12px 20px;border-radius:12px;
+  font-size:13px;font-weight:600;z-index:200;transition:transform .3s;box-shadow:var(--shadow);
+  max-width:90%;text-align:center;
+}
+.toast.show{transform:translate(-50%,0)}
+.toast.err{background:var(--danger)}
+
+/* Hide helper */
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ SPLASH ============ -->
+  <div class="screen active" id="scr-splash">
+    <div class="splash-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10h18M3 10V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3M3 10v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <circle cx="7" cy="14" r="1.2" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="splash-name">Nexo</div>
+    <div class="splash-sub">SUA CARTEIRA DIGITAL</div>
+    <div class="splash-loader"></div>
+  </div>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="screen scroll" id="scr-login">
+    <div class="auth">
+      <div class="auth-head">
+        <h1>Bem-vindo de volta 👋</h1>
+        <p>Acesse sua conta para continuar</p>
+      </div>
+      <div class="field">
+        <label>E-mail ou CPF</label>
+        <input id="login-user" type="text" placeholder="voce@email.com" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input id="login-pass" type="password" placeholder="Sua senha" autocomplete="current-password" />
+      </div>
+      <div class="err" id="login-err"></div>
+      <button class="btn btn-primary" id="btn-login">Entrar</button>
+      <div class="auth-alt">Não tem conta? <a href="#" id="go-register">Criar conta</a></div>
+      <div class="terms">Ao continuar você aceita nossos <a href="#">Termos</a> e <a href="#">Política de Privacidade</a></div>
+    </div>
+  </div>
+
+  <!-- ============ REGISTER ============ -->
+  <div class="screen scroll" id="scr-register">
+    <div class="auth">
+      <a href="#" class="auth-back" id="back-login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Voltar
+      </a>
+      <div class="auth-head">
+        <h1>Criar sua conta</h1>
+        <p>Leva menos de 2 minutos</p>
+      </div>
+      <div class="field"><label>Nome completo</label><input id="reg-name" type="text" placeholder="João da Silva" /></div>
+      <div class="field"><label>CPF</label><input id="reg-cpf" type="tel" placeholder="000.000.000-00" maxlength="14" /></div>
+      <div class="field"><label>Data de nascimento</label><input id="reg-birth" type="date" /></div>
+      <div class="field"><label>E-mail</label><input id="reg-email" type="email" placeholder="voce@email.com" /></div>
+      <div class="field"><label>Telefone</label><input id="reg-phone" type="tel" placeholder="(11) 99999-9999" maxlength="15" /></div>
+      <div class="field"><label>Senha</label><input id="reg-pass" type="password" placeholder="Mínimo 8 caracteres" /></div>
+      <div class="err" id="reg-err"></div>
+      <button class="btn btn-primary" id="btn-register">Criar conta</button>
+      <div class="terms">Ao criar conta você concorda com nossos <a href="#">Termos</a>, <a href="#">Política de Privacidade</a> e autoriza a verificação de identidade (KYC).</div>
+    </div>
+  </div>
+
+  <!-- ============ APP MAIN ============ -->
+  <div class="screen" id="scr-app">
+
+    <div class="app-scroll">
+
+      <!-- ===== HOME TAB ===== -->
+      <div class="tab active" id="tab-home">
+        <div class="home-head">
+          <div class="avatar" id="home-avatar">J</div>
+          <div class="home-greet">
+            <small id="home-hi">Olá,</small>
+            <h2 id="home-name">João</h2>
+          </div>
+          <button class="icon-btn" id="btn-notif">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="dot"></span>
+          </button>
+        </div>
+
+        <div class="balance-card">
+          <div class="bc-top">
+            <span class="bc-label">Saldo disponível</span>
+            <button class="bc-eye" id="btn-eye">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="bc-balance" id="home-balance">R$ ••••••</div>
+          <div class="bc-reserved">
+            <div><small>Reservado</small><strong id="home-reserved">R$ ••••</strong></div>
+            <div><small>Limite Pix noturno</small><strong>R$ 1.000,00</strong></div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="qa" data-action="pix">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L22 12 12 22 2 12z"/></svg></div>
+            <span>Pix</span>
+          </button>
+          <button class="qa" data-action="add">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span>Adicionar</span>
+          </button>
+          <button class="qa" data-action="transfer">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l10-10M7 7h10v10"/></svg></div>
+            <span>Transferir</span>
+          </button>
+          <button class="qa" data-action="pay">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div>
+            <span>Pagar</span>
+          </button>
+        </div>
+        <div class="quick-actions" style="margin-top:10px">
+          <button class="qa" data-action="withdraw">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7L7 17M17 17V7H7"/></svg></div>
+            <span>Sacar</span>
+          </button>
+          <button class="qa" data-action="deposit">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 21h14"/></svg></div>
+            <span>Depositar</span>
+          </button>
+          <button class="qa" data-action="recharge">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+            <span>Recarga</span>
+          </button>
+          <button class="qa" data-action="piggies">
+            <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1-3 2.5-1.5-.5-3-.5-4.5-.5s-3 0-4.5.5C6.8 6 5.5 5 4 5c0 2 1 3.5 1 3.5S4 10 4 12c0 3 2 5 5 5.5V20h6v-2.5c3-.5 5-2.5 5-5.5 0-2-1-3.5-1-3.5s1-1.5 0-3.5z"/></svg></div>
+            <span>Cofrinhos</span>
+          </button>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Meu cartão</h3><a href="#" data-tab-jump="cards">Ver todos</a></div>
+          <div class="vcard" id="home-vcard">
+            <div class="vcard-top">
+              <span class="vcard-brand">nexo</span>
+              <div class="vcard-chip"></div>
+            </div>
+            <div class="vcard-num masked" id="home-vcard-num">•••• •••• •••• 4829</div>
+            <div class="vcard-bottom">
+              <div><small>TITULAR</small><strong id="home-vcard-name">JOÃO SILVA</strong></div>
+              <div class="vcard-flag">VISA</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Movimentação (7 dias)</h3></div>
+          <div class="chart-card">
+            <div class="chart-legend">
+              <span><i class="in"></i>Entradas</span>
+              <span><i class="out"></i>Saídas</span>
+            </div>
+            <svg class="chart-svg" id="chart" viewBox="0 0 340 130" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Últimas movimentações</h3><a href="#" data-tab-jump="extrato">Ver extrato</a></div>
+          <div class="tx-list" id="home-tx"></div>
+        </div>
+
+        <div class="section">
+          <div class="promo">
+            <h4>🎁 Indique e ganhe R$ 20</h4>
+            <p>Convide amigos para a Nexo. Você e eles ganham bônus na primeira transferência.</p>
+            <button onclick="showToast('Link de convite copiado!')">Convidar amigos</button>
+          </div>
+        </div>
+
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- ===== CARDS TAB ===== -->
+      <div class="tab" id="tab-cards">
+        <div style="padding-top:20px">
+          <h2 style="font-size:24px;font-weight:800;letter-spacing:-.6px;margin-bottom:4px">Meus cartões</h2>
+          <p style="color:var(--text-dim);font-size:13.5px">Gerencie cartão virtual e físico</p>
+        </div>
+        <div class="cards-scroll-tabs" style="margin-top:18px">
+          <button class="chip-tab active">Virtual</button>
+          <button class="chip-tab">Físico</button>
+        </div>
+
+        <div class="vcard" id="tab-vcard" style="position:relative">
+          <div class="vcard-top">
+            <span class="vcard-brand">nexo</span>
+            <div class="vcard-chip"></div>
+          </div>
+          <div class="vcard-num masked" id="tab-vcard-num">•••• •••• •••• 4829</div>
+          <div class="vcard-bottom">
+            <div><small>VALIDADE</small><strong id="tab-vcard-exp">••/••</strong></div>
+            <div><small>CVV</small><strong id="tab-vcard-cvv">•••</strong></div>
+            <div class="vcard-flag">VISA</div>
+          </div>
+          <button style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:grid;place-items:center;z-index:2" id="btn-show-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+
+        <div class="card-actions">
+          <button class="ca" data-ca="block">
+            <div class="ca-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div><strong>Bloquear</strong><small>Cartão ativo</small></div>
+          </button>
+          <button class="ca" data-ca="second">
+            <div class="ca-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+            <div><strong>2ª via</strong><small>Solicitar</small></div>
+          </button>
+          <button class="ca" data-ca="limits">
+            <div class="ca-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
+            <div><strong>Limites</strong><small>R$ 5.000</small></div>
+          </button>
+          <button class="ca" data-ca="senha">
+            <div class="ca-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            <div><strong>Senha</strong><small>Alterar</small></div>
+          </button>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Configurações</h3></div>
+          <div class="card" style="background:var(--card);border-radius:var(--radius);padding:4px 16px;border:1px solid var(--border)">
+            <div class="toggle-row">
+              <div><strong>Compras online</strong><small>Habilita uso em sites e apps</small></div>
+              <div class="switch on" data-switch="online"></div>
+            </div>
+            <div class="toggle-row">
+              <div><strong>Pagamento por aproximação</strong><small>NFC habilitado</small></div>
+              <div class="switch on" data-switch="nfc"></div>
+            </div>
+            <div class="toggle-row">
+              <div><strong>Compras internacionais</strong><small>Habilita moeda estrangeira</small></div>
+              <div class="switch" data-switch="intl"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Últimas compras</h3></div>
+          <div class="tx-list" id="card-tx"></div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- ===== PIX TAB ===== -->
+      <div class="tab" id="tab-pix">
+        <div style="padding-top:20px">
+          <h2 style="font-size:24px;font-weight:800;letter-spacing:-.6px">Pix</h2>
+        </div>
+
+        <div class="pix-hero">
+          <h3>Envie dinheiro em segundos</h3>
+          <p>Sem taxas. 24 horas por dia.</p>
+          <button onclick="showToast('Abrindo leitor de QR Code…')">Escanear QR Code</button>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Enviar</h3></div>
+          <div class="pix-grid">
+            <button class="pix-opt" data-pix="key"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3M9 17H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><path d="M8 12h8"/></svg></div><strong>Por chave</strong><small>CPF, e-mail, telefone</small></button>
+            <button class="pix-opt" data-pix="bank"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6M3 9v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9M9 21V13h6v8"/></svg></div><strong>Dados bancários</strong><small>Agência e conta</small></button>
+            <button class="pix-opt" data-pix="copy"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div><strong>Copia e cola</strong><small>Código Pix</small></button>
+            <button class="pix-opt" data-pix="qr"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7h-7z"/></svg></div><strong>QR Code</strong><small>Escanear</small></button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Receber</h3></div>
+          <div class="pix-grid">
+            <button class="pix-opt" data-pix="receive"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><strong>Gerar QR Code</strong><small>Cobrança</small></button>
+            <button class="pix-opt" data-pix="keys"><div class="pix-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l4 6-4 6-4-6z"/><circle cx="12" cy="18" r="3"/></svg></div><strong>Minhas chaves</strong><small>Gerenciar</small></button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Favoritos</h3></div>
+          <div class="fav-row" id="pix-favs"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><h3>Histórico Pix</h3></div>
+          <div class="tx-list" id="pix-tx"></div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- ===== EXTRATO TAB ===== -->
+      <div class="tab" id="tab-extrato">
+        <div style="padding-top:20px">
+          <h2 style="font-size:24px;font-weight:800;letter-spacing:-.6px;margin-bottom:4px">Extrato</h2>
+          <p style="color:var(--text-dim);font-size:13.5px">Acompanhe suas movimentações</p>
+        </div>
+        <div class="filter-row" style="margin-top:18px">
+          <button class="chip-tab active" data-filter="all">Todas</button>
+          <button class="chip-tab" data-filter="in">Entradas</button>
+          <button class="chip-tab" data-filter="out">Saídas</button>
+        </div>
+        <div id="extrato-groups"></div>
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- ===== PERFIL TAB ===== -->
+      <div class="tab" id="tab-perfil">
+        <div class="profile-head">
+          <div class="profile-av" id="profile-av">J</div>
+          <h3 id="profile-name">João Silva</h3>
+          <p id="profile-email">joao@email.com</p>
+        </div>
+
+        <div class="profile-menu">
+          <div class="pm-item" data-pm="dados">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div><strong>Dados pessoais</strong><small>Nome, CPF, documentos</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="pm-item" data-pm="security">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><strong>Segurança</strong><small>Senha, biometria, dispositivos</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="pm-item" data-pm="notif">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div><strong>Notificações</strong><small>Alertas e preferências</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="pm-item" data-pm="theme">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div>
+            <div><strong>Aparência</strong><small id="theme-label">Escuro</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="pm-item" data-pm="help">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+            <div><strong>Ajuda & suporte</strong><small>Chat, atendimento, protocolos</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="profile-menu">
+          <div class="pm-item danger" data-pm="logout">
+            <div class="pm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
+            <div><strong>Sair da conta</strong><small>Encerrar sessão</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding:24px 0;color:var(--text-mute);font-size:11px">
+          Nexo Wallet • versão 1.0.0<br>
+          Conta de pagamento — instituição parceira autorizada
+        </div>
+      </div>
+
+    </div><!-- /app-scroll -->
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" data-tab="cards">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        <span>Cartões</span>
+      </button>
+      <button class="nav-item" data-tab="pix">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L22 12 12 22 2 12z"/></svg>
+        <span>Pix</span>
+      </button>
+      <button class="nav-item" data-tab="extrato">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <span>Extrato</span>
+      </button>
+      <button class="nav-item" data-tab="perfil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+/* ============================================================
+   NEXO WALLET — Módulo 1 (Frontend / App do Cliente)
+   API endpoints prontos para Módulo 2 (backend)
+   ============================================================ */
+
+/* ============ CONFIG ============ */
+const CONFIG = {
+  // Deixe vazio para o mesmo origin (Render static + API no mesmo domínio)
+  // Ou coloque a URL do backend: 'https://sua-api.onrender.com'
+  API_BASE: '',
+  DEMO_MODE: true,   // true = usa dados fictícios. Mude para false quando o backend estiver pronto.
+  TIMEOUT: 8000
+};
+
+/* ============ API CLIENT (pronto p/ Módulo 2) ============ */
+const API = {
+  token: null,
+  async request(path, opts = {}) {
+    const url = (CONFIG.API_BASE || '') + path;
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    if (API.token) headers['Authorization'] = 'Bearer ' + API.token;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT);
+    try {
+      const res = await fetch(url, { ...opts, headers, signal: ctrl.signal });
+      clearTimeout(t);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      clearTimeout(t);
+      throw e;
+    }
+  },
+  // Endpoints que o backend (Módulo 2) deve expor:
+  login:    (b) => API.request('/api/auth/login',    { method: 'POST', body: JSON.stringify(b) }),
+  register: (b) => API.request('/api/auth/register', { method: 'POST', body: JSON.stringify(b) }),
+  me:       ()  => API.request('/api/me'),
+  balance:  ()  => API.request('/api/account/balance'),
+  tx:       ()  => API.request('/api/transactions'),
+  cards:    ()  => API.request('/api/cards'),
+  pixSend:  (b) => API.request('/api/pix/send',  { method: 'POST', body: JSON.stringify(b) }),
+  pixKeys:  ()  => API.request('/api/pix/keys'),
+};
+
+/* ============ DEMO DATA ============ */
+const DEMO = {
+  user: { name: 'João Silva', email: 'joao@email.com', cpf: '123.456.789-00' },
+  balance: 2847.50,
+  reserved: 500.00,
+  card: { last4: '4829', exp: '12/29', cvv: '842', flag: 'VISA', titular: 'JOÃO SILVA' },
+  transactions: [
+    { id:'t1', type:'in',  title:'Pix recebido',        sub:'Maria Souza',        amount:450.00,  date:'2025-01-15T10:22:00', status:'concluido' },
+    { id:'t2', type:'out', title:'Pix enviado',         sub:'Carlos Lima',        amount:120.00,  date:'2025-01-15T08:05:00', status:'concluido' },
+    { id:'t3', type:'out', title:'Compra no débito',    sub:'Padaria Pão Quente', amount:28.50,   date:'2025-01-14T19:40:00', status:'concluido' },
+    { id:'t4', type:'in',  title:'Depósito',            sub:'Boleto compensado',  amount:1200.00, date:'2025-01-14T11:00:00', status:'concluido' },
+    { id:'t5', type:'out', title:'Pagamento de boleto', sub:'Energia Elétrica',   amount:187.32,  date:'2025-01-13T09:15:00', status:'concluido' },
+    { id:'t6', type:'out', title:'Pix enviado',         sub:'Ana Beatriz',        amount:80.00,   date:'2025-01-12T16:30:00', status:'pendente' },
+    { id:'t7', type:'in',  title:'Pix recebido',        sub:'Empresa XYZ Ltda',   amount:2500.00, date:'2025-01-11T08:00:00', status:'concluido' },
+    { id:'t8', type:'out', title:'Recarga celular',     sub:'Vivo — (11)99999',   amount:30.00,   date:'2025-01-10T14:22:00', status:'concluido' },
+  ],
+  favorites: [
+    { name:'Maria',  initial:'M' },
+    { name:'Carlos', initial:'C' },
+    { name:'Ana',    initial:'A' },
+    { name:'Pedro',  initial:'P' },
+    { name:'Julia',  initial:'J' },
+  ],
+  chart: { // entradas / saídas últimos 7 dias
+    in:  [0, 1200, 0, 450, 2500, 0, 0],
+    out: [100, 187, 28, 120, 30, 80, 0],
+    labels: ['9','10','11','12','13','14','15']
+  }
+};
+
+/* ============ STATE ============ */
+const state = {
+  user: null,
+  balance: 0,
+  reserved: 0,
+  card: null,
+  transactions: [],
+  favorites: [],
+  chart: null,
+  showBalance: false,
+  showCardData: false,
+  theme: localStorage.getItem('nexo-theme') || 'auto',
+  activeTab: 'home',
+  filter: 'all',
+  cardBlocked: false,
+};
+
+/* ============ UTIL ============ */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const brl = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+
+function showToast(msg, isErr=false) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.toggle('err', isErr);
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $('#' + id).classList.add('active');
+}
+
+function setTab(name) {
+  state.activeTab = name;
+  $$('.tab').forEach(t => t.classList.remove('active'));
+  $('#tab-' + name).classList.add('active');
+  $$('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === name));
+  $('.app-scroll').scrollTop = 0;
+}
+
+function toggleModal(html) {
+  const ov = $('#modal-overlay');
+  if (html === null) {
+    ov.classList.remove('show');
+    setTimeout(() => { $('#modal-content').innerHTML = ''; }, 250);
+  } else {
+    $('#modal-content').innerHTML = html;
+    ov.classList.add('show');
+  }
+}
+
+function applyTheme() {
+  const pref = state.theme;
+  const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const real = pref === 'auto' ? sys : pref;
+  document.documentElement.setAttribute('data-theme', real);
+  const lbl = { auto: 'Automático', dark: 'Escuro', light: 'Claro' }[pref];
+  if ($('#theme-label')) $('#theme-label').textContent = lbl;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', real === 'dark' ? '#17131D' : '#ffffff');
+}
+
+/* ============ RENDER: HOME ============ */
+function renderHome() {
+  const u = state.user;
+  $('#home-avatar').textContent = u.name.charAt(0).toUpperCase();
+  $('#home-name').textContent    = u.name.split(' ')[0];
+  $('#home-hi').textContent      = getGreeting() + ',';
+  $('#home-balance').textContent = state.showBalance ? brl(state.balance) : 'R$ ••••••';
+  $('#home-balance').classList.toggle('hidden-amount', !state.showBalance);
+  $('#home-reserved').textContent = state.showBalance ? brl(state.reserved) : 'R$ ••••';
+
+  // home tx (5)
+  $('#home-tx').innerHTML = state.transactions.slice(0, 5).map(txHTML).join('');
+
+  // chart
+  renderChart();
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Bom dia';
+  if (h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
+function txHTML(t) {
+  const isIn = t.type === 'in';
+  const icon = isIn
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+  const sign = isIn ? '+' : '−';
+  const date = new Date(t.date);
+  const dstr = date.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }) + ' • ' +
+               date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  return `
+    <div class="tx" data-txid="${t.id}">
+      <div class="tx-ico ${t.type}">${icon}</div>
+      <div class="tx-body">
+        <strong>${t.title}</strong>
+        <small>${t.sub} • ${dstr}</small>
+      </div>
+      <div class="tx-amount ${t.type}">${sign} ${brl(t.amount)}</div>
+    </div>`;
+}
+
+function renderChart() {
+  const c = state.chart;
+  const svg = $('#chart');
+  if (!svg || !c) return;
+  const W = 340, H = 130, padB = 18, padT = 6;
+  const barW = 12, gap = (W - c.in.length * barW * 2) / (c.in.length + 1);
+  const maxV = Math.max(...c.in, ...c.out, 1);
+  const usableH = H - padB - padT;
+  let items = '';
+  c.in.forEach((vin, i) => {
+    const xIn  = gap + i * (barW * 2 + gap);
+    const xOut = xIn + barW + 2;
+    const hIn  = (vin / maxV) * usableH;
+    const hOut = (c.out[i] / maxV) * usableH;
+    items += `<rect x="${xIn}" y="${padT + usableH - hIn}" width="${barW}" height="${hIn}" rx="3" fill="var(--success)" opacity=".85"/>`;
+    items += `<rect x="${xOut}" y="${padT + usableH - hOut}" width="${barW}" height="${hOut}" rx="3" fill="var(--purple-500)" opacity=".9"/>`;
+    items += `<text x="${xIn + barW}" y="${H - 4}" font-size="9" text-anchor="middle" fill="var(--text-mute)" font-family="system-ui">${c.labels[i]}</text>`;
+  });
+  svg.innerHTML = items;
+}
+
+/* ============ RENDER: CARDS ============ */
+function renderCards() {
+  const c = state.card;
+  const maskedNum = state.showCardData
+    ? `•••• •••• •••• ${c.last4}`
+    : `•••• •••• •••• ${c.last4}`;
+  $('#tab-vcard-num').textContent = maskedNum;
+  $('#tab-vcard-exp').textContent = state.showCardData ? c.exp : '••/••';
+  $('#tab-vcard-cvv').textContent = state.showCardData ? c.cvv : '•••';
+  $('#home-vcard-num').textContent = `•••• •••• •••• ${c.last4}`;
+  $('#home-vcard-name').textContent = c.titular;
+
+  // card tx
+  const cardTx = state.transactions.filter(t => t.title.toLowerCase().includes('compra') || t.title.toLowerCase().includes('recarga'));
+  $('#card-tx').innerHTML = cardTx.map(txHTML).join('') || '<p style="color:var(--text-dim);font-size:13px;padding:8px 0">Nenhuma compra recente.</p>';
+}
+
+/* ============ RENDER: PIX ============ */
+function renderPix() {
+  $('#pix-favs').innerHTML = state.favorites.map(f =>
+    `<button class="fav" data-fav="${f.name}"><div class="fav-av">${f.initial}</div><span>${f.name}</span></button>`
+  ).join('');
+  const pixTx = state.transactions.filter(t => t.title.toLowerCase().includes('pix'));
+  $('#pix-tx').innerHTML = pixTx.slice(0, 6).map(txHTML).join('') || '<p style="color:var(--text-dim);font-size:13px;padding:8px 0">Nenhum Pix ainda.</p>';
+}
+
+/* ============ RENDER: EXTRATO ============ */
+function renderExtrato() {
+  const filtered = state.transactions.filter(t => state.filter === 'all' || t.type === state.filter);
+  const groups = {};
+  filtered.forEach(t => {
+    const d = new Date(t.date);
+    const key = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+    (groups[key] = groups[key] || []).push(t);
+  });
+  const html = Object.entries(groups).map(([date, list]) => `
+    <div class="date-group">
+      <h5>${date}</h5>
+      <div class="tx-list">${list.map(txHTML).join('')}</div>
+    </div>
+  `).join('') || '<p style="color:var(--text-dim);font-size:13px;text-align:center;padding:32px 0">Nenhuma movimentação encontrada.</p>';
+  $('#extrato-groups').innerHTML = html;
+}
+
+/* ============ RENDER: PERFIL ============ */
+function renderPerfil() {
+  const u = state.user;
+  $('#profile-av').textContent = u.name.charAt(0).toUpperCase();
+  $('#profile-name').textContent = u.name;
+  $('#profile-email').textContent = u.email;
+}
+
+/* ============ BOOT / AUTH ============ */
+async function boot() {
+  applyTheme();
+
+  // detecta system theme change
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.theme === 'auto') applyTheme();
+  });
+
+  await new Promise(r => setTimeout(r, 1600));
+  showScreen('scr-login');
+  bindAuth();
+}
+
+function bindAuth() {
+  // ir para cadastro
+  $('#go-register').onclick = (e) => { e.preventDefault(); showScreen('scr-register'); };
+  $('#back-login').onclick  = (e) => { e.preventDefault(); showScreen('scr-login'); };
+
+  // máscaras
+  $('#reg-cpf').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+  });
+  $('#reg-phone').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+    e.target.value = v;
+  });
+
+  // login
+  $('#btn-login').onclick = doLogin;
+  $('#login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // register
+  $('#btn-register').onclick = doRegister;
+}
+
+async function doLogin() {
+  const user = $('#login-user').value.trim();
+  const pass = $('#login-pass').value;
+  const err  = $('#login-err');
+  err.classList.remove('show');
+
+  if (!user || !pass) { err.textContent = 'Preencha todos os campos.'; err.classList.add('show'); return; }
+
+  const btn = $('#btn-login');
+  btn.disabled = true; btn.textContent = 'Entrando…';
+
+  try {
+    let data;
+    if (CONFIG.DEMO_MODE) {
+      await new Promise(r => setTimeout(r, 700));
+      data = { user: DEMO.user, token: 'demo-token' };
+    } else {
+      data = await API.login({ user, password: pass });
+      API.token = data.token;
+    }
+    state.user = data.user;
+    await loadAppData();
+    showScreen('scr-app');
+    renderAll();
+    bindApp();
+  } catch (e) {
+    err.textContent = 'Não foi possível entrar. Verifique os dados.';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+async function doRegister() {
+  const name  = $('#reg-name').value.trim();
+  const cpf   = $('#reg-cpf').value.trim();
+  const birth = $('#reg-birth').value;
+  const email = $('#reg-email').value.trim();
+  const phone = $('#reg-phone').value.trim();
+  const pass  = $('#reg-pass').value;
+  const err   = $('#reg-err');
+  err.classList.remove('show');
+
+  const fail = (msg) => { err.textContent = msg; err.classList.add('show'); };
+
+  if (!name || name.split(' ').length < 2) return fail('Informe nome e sobrenome.');
+  if (cpf.replace(/\D/g,'').length !== 11) return fail('CPF inválido.');
+  if (!birth) return fail('Informe a data de nascimento.');
+  if (!/^\S+@\S+\.\S+$/.test(email)) return fail('E-mail inválido.');
+  if (phone.replace(/\D/g,'').length < 10) return fail('Telefone inválido.');
+  if (pass.length < 8) return fail('Senha precisa de pelo menos 8 caracteres.');
+
+  const btn = $('#btn-register');
+  btn.disabled = true; btn.textContent = 'Criando conta…';
+
+  try {
+    if (CONFIG.DEMO_MODE) {
+      await new Promise(r => setTimeout(r, 900));
+      state.user = { name, email, cpf };
+    } else {
+      const data = await API.register({ name, cpf, birth, email, phone, password: pass });
+      API.token = data.token;
+      state.user = data.user;
+    }
+    await loadAppData();
+    showScreen('scr-app');
+    renderAll();
+    bindApp();
+    showToast('Conta criada! Bem-vindo(a), ' + name.split(' ')[0]);
+  } catch (e) {
+    fail('Não foi possível criar a conta. Tente novamente.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Criar conta';
+  }
+}
+
+async function loadAppData() {
+  if (CONFIG.DEMO_MODE) {
+    state.balance     = DEMO.balance;
+    state.reserved    = DEMO.reserved;
+    state.card        = DEMO.card;
+    state.transactions = DEMO.transactions;
+    state.favorites   = DEMO.favorites;
+    state.chart       = DEMO.chart;
+  } else {
+    const [bal, tx, cards, favs] = await Promise.all([
+      API.balance(), API.tx(), API.cards(), Promise.resolve(DEMO.favorites)
+    ]);
+    state.balance = bal.available;
+    state.reserved = bal.reserved;
+    state.card = cards[0];
+    state.transactions = tx;
+    state.favorites = favs;
+    state.chart = bal.chart || DEMO.chart;
+  }
+}
+
+function renderAll() {
+  renderHome();
+  renderCards();
+  renderPix();
+  renderExtrato();
+  renderPerfil();
+}
+
+/* ============ BIND APP (após login) ============ */
+let appBound = false;
+function bindApp() {
+  if (appBound) return;
+  appBound = true;
+
+  // nav
+  $$('.nav-item').forEach(n => n.onclick = () => setTab(n.dataset.tab));
+  $$('[data-tab-jump]').forEach(a => a.onclick = (e) => { e.preventDefault(); setTab(a.dataset.tabJump); });
+
+  // olho do saldo
+  $('#btn-eye').onclick = () => {
+    state.showBalance = !state.showBalance;
+    renderHome();
+  };
+
+  // notificações
+  $('#btn-notif').onclick = () => showToast('Você tem 2 notificações novas');
+
+  // ações rápidas
+  $$('.qa').forEach(b => b.onclick = () => {
+    const a = b.dataset.action;
+    const map = {
+      pix: () => setTab('pix'),
+      add: () => showToast('Abrindo opções de depósito…'),
+      transfer: () => showToast('Abrindo transferência…'),
+      pay: () => showToast('Abrindo pagamentos…'),
+      withdraw: () => showToast('Abrindo saque…'),
+      deposit: () => showToast('Abrindo depósito…'),
+      recharge: () => showToast('Abrindo recargas…'),
+      piggies: () => showToast('Cofrinhos em breve 🔒'),
+    };
+    (map[a] || (()=>{}))();
+  });
+
+  // mostrar dados do cartão
+  $('#btn-show-card').onclick = () => {
+    state.showCardData = !state.showCardData;
+    renderCards();
+    showToast(state.showCardData ? 'Dados visíveis por 10 segundos' : 'Dados ocultos');
+    if (state.showCardData) {
+      clearTimeout(window._hideCard);
+      window._hideCard = setTimeout(() => { state.showCardData = false; renderCards(); }, 10000);
+    }
+  };
+
+  // ações do cartão
+  $$('.ca').forEach(c => c.onclick = () => {
+    const a = c.dataset.ca;
+    if (a === 'block') {
+      state.cardBlocked = !state.cardBlocked;
+      c.querySelector('small').textContent = state.cardBlocked ? 'Cartão bloqueado' : 'Cartão ativo';
+      showToast(state.cardBlocked ? 'Cartão bloqueado' : 'Cartão desbloqueado');
+    } else if (a === 'second') showToast('2ª via solicitada — chega em 7 dias úteis');
+    else if (a === 'limits') showToast('Abrindo ajuste de limites…');
+    else if (a === 'senha') showToast('Abrindo alteração de senha…');
+  });
+
+  // switches (cartão)
+  $$('[data-switch]').forEach(sw => sw.onclick = () => {
+    sw.classList.toggle('on');
+    const on = sw.classList.contains('on');
+    const label = { online:'Compras online', nfc:'Aproximação', intl:'Compras internacionais' }[sw.dataset.switch];
+    showToast(label + (on ? ' ativado' : ' desativado'));
+  });
+
+  // pix opções
+  $$('[data-pix]').forEach(p => p.onclick = () => {
+    showToast('Fluxo Pix: ' + p.querySelector('strong').textContent + ' (Módulo 2)');
+  });
+
+  // favoritos pix
+  $$('[data-fav]').forEach(f => f.onclick = () => showToast('Enviar Pix para ' + f.dataset.fav + ' (Módulo 2)'));
+
+  // filtros extrato
+  $$('[data-filter]').forEach(f => f.onclick = () => {
+    $$('[data-filter]').forEach(x => x.classList.remove('active'));
+    f.classList.add('active');
+    state.filter = f.dataset.filter;
+    renderExtrato();
+  });
+
+  // detalhe de transação (delegação)
+  document.addEventListener('click', (e) => {
+    const txEl = e.target.closest('.tx');
+    if (!txEl || !state.activeTab) return;
+    const t = state.transactions.find(x => x.id === txEl.dataset.txid);
+    if (!t) return;
+    const isIn = t.type === 'in';
+    toggleModal(`
+      <div class="modal-grip"></div>
+      <h3 style="text-align:center;font-size:24px;margin-top:8px;color:${isIn?'var(--success)':'var(--text)'}">${isIn?'+':'−'} ${brl(t.amount)}</h3>
+      <p style="text-align:center;margin-bottom:18px">${t.title}</p>
+      <div class="detail-row"><span>Destinatário/Origem</span><strong>${t.sub}</strong></div>
+      <div class="detail-row"><span>Data</span><strong>${new Date(t.date).toLocaleString('pt-BR')}</strong></div>
+      <div class="detail-row"><span>Status</span><strong style="text-transform:capitalize">${t.status}</strong></div>
+      <div class="detail-row"><span>Tipo</span><strong>${isIn?'Entrada':'Saída'}</strong></div>
+      <div class="detail-row"><span>ID</span><strong style="font-size:11px">${t.id}</strong></div>
+      <button class="btn btn-ghost" style="margin-top:16px" onclick="toggleModal(null)">Fechar</button>
+      <button class="btn btn-primary" onclick="showToast('Comprovante gerado (PDF)')">Baixar comprovante</button>
+    `);
+  });
+
+  // perfil
+  $$('[data-pm]').forEach(p => p.onclick = () => {
+    const a = p.dataset.pm;
+    if (a === 'logout') {
+      toggleModal(`
+        <div class="modal-grip"></div>
+        <h3>Sair da conta?</h3>
+        <p>Você poderá entrar novamente quando quiser.</p>
+        <button class="btn btn-primary" style="background:var(--danger);box-shadow:none" id="confirm-logout">Sair</button>
+        <button class="btn btn-ghost" onclick="toggleModal(null)">Cancelar</button>
+      `);
+      $('#confirm-logout').onclick = () => {
+        toggleModal(null);
+        state.user = null;
+        appBound = false;
+        showScreen('scr-login');
+      };
+      return;
+    }
+    if (a === 'theme') {
+      cycleTheme();
+      return;
+    }
+    if (a === 'dados')    showToast('Módulo de dados pessoais em breve');
+    if (a === 'security') showToast('Módulo de segurança em breve');
+    if (a === 'notif')    showToast('Módulo de notificações em breve');
+    if (a === 'help')     showToast('Abrindo chat de suporte…');
+  });
+
+  // fecha modal ao clicar no overlay
+  $('#modal-overlay').onclick = (e) => {
+    if (e.target.id === 'modal-overlay') toggleModal(null);
+  };
+}
+
+function cycleTheme() {
+  const order = ['auto', 'light', 'dark'];
+  state.theme = order[(order.indexOf(state.theme) + 1) % 3];
+  localStorage.setItem('nexo-theme', state.theme);
+  applyTheme();
+  showToast('Tema: ' + ({ auto:'Automático', light:'Claro', dark:'Escuro' }[state.theme]));
+}
+
+/* expõe para usar em handlers inline */
+window.toggleModal = toggleModal;
+window.showToast = showToast;
+
+/* ============ START ============ */
+boot();
+</script>
+</body>
+</html>
