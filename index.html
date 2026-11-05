@@ -4,34 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#0A2540" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
 <title>Nexo — Sua conta digital</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy-900:#04101F;--navy-800:#071A33;--navy-700:#0A2540;
-  --navy-600:#102E52;--navy-500:#163A6B;
+  --navy-900:#04101F;--navy-800:#071A33;--navy-700:#0A2540;--navy-600:#102E52;
   --blue-500:#1E62F0;--blue-400:#3B7CFF;--blue-300:#7BA4FF;--blue-100:#E5EDFF;
-  --success:#12B76A;--danger:#F04438;--warn:#F79009;
+  --success:#12B76A;--danger:#F04438;
   --r-lg:16px;--r-md:12px;--r-sm:8px;
   --t:200ms cubic-bezier(.22,1,.36,1);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 [data-theme="light"]{
-  --bg:#F5F7FA;--surface:#FFFFFF;--surface-2:#F8FAFC;
+  --bg:#FFFFFF;--surface:#F8FAFC;--surface-2:#F1F5F9;
   --text:#0A2540;--text-dim:#64748B;--text-mute:#94A3B8;
-  --border:#E4E9F0;--input-bg:#F5F7FA;--card-grad-a:#0A2540;--card-grad-b:#102E52;
-  --shadow:0 1px 2px rgba(10,37,64,0.06);
+  --border:#E2E8F0;--input-bg:#F8FAFC;
+  --card-grad-a:#0A2540;--card-grad-b:#102E52;
+  --shadow:0 1px 3px rgba(10,37,64,0.05);
   --shadow-lg:0 8px 32px rgba(10,37,64,0.08);
-  --nav-bg:rgba(255,255,255,0.96);--nav-border:rgba(10,37,64,0.08);
+  --nav-bg:rgba(255,255,255,0.98);--nav-border:rgba(10,37,64,0.06);
 }
 [data-theme="dark"]{
   --bg:#04101F;--surface:#0A1A33;--surface-2:#0F2444;
   --text:#FFFFFF;--text-dim:#8CA2BF;--text-mute:#5A6E88;
-  --border:#163A6B;--input-bg:#0F2444;--card-grad-a:#0F2E5C;--card-grad-b:#04101F;
+  --border:#163A6B;--input-bg:#0F2444;
+  --card-grad-a:#0F2E5C;--card-grad-b:#04101F;
   --shadow:0 2px 8px rgba(0,0,0,0.3);
   --shadow-lg:0 12px 40px rgba(0,0,0,0.4);
-  --nav-bg:rgba(10,26,51,0.96);--nav-border:rgba(255,255,255,0.06);
+  --nav-bg:rgba(10,26,51,0.98);--nav-border:rgba(255,255,255,0.06);
 }
 html,body{height:100%}
 body{
@@ -57,86 +57,172 @@ a{color:var(--blue-500);text-decoration:none}
 /* ============ SPLASH ============ */
 #scr-splash{background:var(--navy-700);align-items:center;justify-content:center;gap:20px}
 .splash-mark{
-  width:88px;height:88px;border-radius:22px;background:#fff;
-  display:grid;place-items:center;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  width:80px;height:80px;border-radius:20px;background:#fff;
+  display:grid;place-items:center;box-shadow:0 20px 60px rgba(0,0,0,.25);
   animation:splashIn .8s cubic-bezier(.22,1,.36,1);
 }
-.splash-mark svg{width:44px;height:44px;color:var(--navy-700)}
-.splash-word{color:#fff;font-size:30px;font-weight:800;letter-spacing:-1px;animation:splashIn .8s .15s both}
-.splash-loader{margin-top:8px;width:28px;height:28px;border-radius:50%;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .8s linear infinite}
+.splash-mark svg{width:40px;height:40px;color:var(--navy-700)}
+.splash-word{color:#fff;font-size:28px;font-weight:700;letter-spacing:-.8px;animation:splashIn .8s .15s both}
+.splash-loader{margin-top:8px;width:24px;height:24px;border-radius:50%;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes splashIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 
-/* ============ AUTH LOGIN ============ */
-.auth{padding:24px 24px calc(24px + var(--safe-b));overflow-y:auto;display:flex;flex-direction:column;min-height:100%}
-.auth-top{padding-top:32px}
-.auth-logo{width:52px;height:52px;border-radius:14px;background:var(--navy-700);display:grid;place-items:center;margin-bottom:28px}
-.auth-logo svg{width:26px;height:26px;color:#fff}
-.auth-title{font-size:30px;font-weight:800;letter-spacing:-.8px;line-height:1.15;margin-bottom:8px}
-.auth-sub{color:var(--text-dim);font-size:15px;line-height:1.5}
-.auth-form{margin-top:32px;flex:1}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px}
-.field input{
+/* ============ LOGIN PREMIUM ============ */
+#scr-login{background:var(--bg)}
+.login-wrap{
+  flex:1;display:flex;flex-direction:column;
+  padding:0 24px calc(24px + var(--safe-b));
+  max-width:400px;margin:0 auto;width:100%;
+  overflow-y:auto;
+}
+.login-header{padding-top:56px;text-align:center}
+.login-logo{
+  width:56px;height:56px;border-radius:14px;background:var(--navy-700);
+  display:grid;place-items:center;margin:0 auto 24px;
+  box-shadow:0 8px 20px rgba(10,37,64,.15);
+}
+.login-logo svg{width:28px;height:28px;color:#fff}
+.login-title{
+  font-size:28px;font-weight:800;letter-spacing:-.8px;line-height:1.2;
+  color:var(--text);margin-bottom:8px;
+}
+.login-sub{
+  font-size:15px;color:var(--text-dim);line-height:1.5;
+}
+
+/* Seletor CPF / E-mail */
+.login-tabs{
+  display:flex;background:var(--surface);border-radius:var(--r-md);
+  padding:4px;margin-top:32px;border:1px solid var(--border);
+}
+.login-tab{
+  flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;
+  color:var(--text-dim);text-align:center;transition:all var(--t);
+}
+.login-tab.active{
+  background:var(--navy-700);color:#fff;
+  box-shadow:0 2px 8px rgba(10,37,64,.15);
+}
+[data-theme="dark"] .login-tab.active{background:var(--blue-500)}
+
+/* Campo de entrada premium */
+.login-field{margin-top:20px}
+.login-field label{
+  display:block;font-size:13px;font-weight:600;color:var(--text-dim);
+  margin-bottom:8px;letter-spacing:.1px;
+}
+.login-input-wrap{
+  position:relative;display:flex;align-items:center;
+}
+.login-input{
   width:100%;padding:16px 18px;border-radius:var(--r-md);
-  background:var(--surface);border:1.5px solid var(--border);
-  font-size:16px;color:var(--text);
+  background:var(--input-bg);border:1.5px solid var(--border);
+  font-size:16px;color:var(--text);font-weight:500;
   transition:border-color var(--t),background var(--t);
 }
-.field input:focus{border-color:var(--blue-500)}
-.field input::placeholder{color:var(--text-mute)}
-.field-hint{font-size:12px;color:var(--text-mute);margin-top:6px}
-.btn{
-  width:100%;padding:16px;border-radius:var(--r-md);
-  font-size:16px;font-weight:600;letter-spacing:-.2px;
-  transition:transform var(--t),opacity var(--t),background var(--t);
+.login-input:focus{border-color:var(--blue-500);background:var(--bg)}
+.login-input::placeholder{color:var(--text-mute);font-weight:400}
+.login-eye{
+  position:absolute;right:14px;width:32px;height:32px;
+  display:grid;place-items:center;border-radius:50%;
 }
-.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--navy-700);color:#fff}
-.btn-primary:disabled{opacity:.5}
-.btn-blue{background:var(--blue-500);color:#fff}
-.btn-ghost{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
-.auth-bottom{margin-top:24px;text-align:center;font-size:14px;color:var(--text-dim)}
-.auth-bottom a{font-weight:600}
-.auth-terms{margin-top:20px;font-size:11.5px;color:var(--text-mute);text-align:center;line-height:1.5}
-.auth-terms a{color:var(--blue-500);font-weight:500}
-.err{color:var(--danger);font-size:13px;margin-bottom:12px;display:none;font-weight:500}
+.login-eye svg{width:18px;height:18px;color:var(--text-mute)}
+
+/* Links auxiliares */
+.login-aux{
+  display:flex;justify-content:flex-end;margin-top:12px;
+}
+.login-aux a{font-size:13.5px;font-weight:500;color:var(--blue-500)}
+
+/* Botão principal */
+.login-btn{
+  width:100%;padding:17px;border-radius:var(--r-md);
+  background:var(--navy-700);color:#fff;
+  font-size:16px;font-weight:700;letter-spacing:-.2px;
+  margin-top:24px;transition:transform var(--t),opacity var(--t);
+  box-shadow:0 4px 14px rgba(10,37,64,.2);
+}
+.login-btn:active{transform:scale(.98)}
+.login-btn:disabled{opacity:.5}
+[data-theme="dark"] .login-btn{background:var(--blue-500)}
+
+/* Divisor */
+.login-divider{
+  display:flex;align-items:center;gap:14px;
+  margin-top:28px;color:var(--text-mute);font-size:12px;font-weight:500;
+}
+.login-divider::before,.login-divider::after{
+  content:"";flex:1;height:1px;background:var(--border);
+}
+
+/* Login social / biométrico */
+.login-alt{
+  display:flex;flex-direction:column;gap:10px;margin-top:16px;
+}
+.alt-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px;border-radius:var(--r-md);
+  background:var(--surface);border:1px solid var(--border);
+  font-size:14px;font-weight:600;color:var(--text);
+  transition:background var(--t);
+}
+.alt-btn:active{background:var(--surface-2)}
+.alt-btn svg{width:20px;height:20px}
+
+/* Footer */
+.login-footer{
+  margin-top:auto;padding-top:32px;text-align:center;
+}
+.login-footer .create-account{
+  font-size:14.5px;color:var(--text-dim);
+}
+.login-footer .create-account a{font-weight:700;color:var(--blue-500)}
+.login-terms{
+  margin-top:20px;font-size:11.5px;color:var(--text-mute);line-height:1.5;
+}
+.login-terms a{color:var(--blue-500)}
+
+/* Erro */
+.err{
+  color:var(--danger);font-size:13px;font-weight:500;
+  margin-top:10px;display:none;
+}
 .err.show{display:block}
 
 /* ============ ONBOARDING (WIZARD) ============ */
-#scr-onboarding{background:var(--surface)}
+#scr-onboarding{background:var(--bg)}
 .onb-top{
   display:flex;align-items:center;gap:14px;
-  padding:20px 20px 8px;
+  padding:20px 24px 8px;max-width:400px;margin:0 auto;width:100%;
 }
 .onb-back{
   width:40px;height:40px;border-radius:50%;
-  background:var(--surface-2);border:1px solid var(--border);
+  background:var(--surface);border:1px solid var(--border);
   display:grid;place-items:center;flex-shrink:0;
-  transition:background var(--t);
 }
-.onb-back:active{background:var(--border)}
+.onb-back:active{background:var(--surface-2)}
 .onb-back svg{width:18px;height:18px;color:var(--text)}
-.onb-progress{flex:1;height:4px;background:var(--surface-2);border-radius:4px;overflow:hidden}
-.onb-progress-fill{height:100%;background:var(--blue-500);border-radius:4px;transition:width .4s cubic-bezier(.22,1,.36,1);width:16.6%}
-.onb-stepnum{font-size:13px;color:var(--text-dim);font-weight:500;min-width:32px;text-align:right}
+.onb-progress{flex:1;height:3px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.onb-progress-fill{height:100%;background:var(--blue-500);border-radius:3px;transition:width .4s cubic-bezier(.22,1,.36,1);width:16.6%}
+.onb-stepnum{font-size:13px;color:var(--text-mute);font-weight:600;min-width:32px;text-align:right}
 
 .onb-body{
   flex:1;overflow-y:auto;padding:32px 24px calc(24px + var(--safe-b));
   display:flex;flex-direction:column;
+  max-width:400px;margin:0 auto;width:100%;
 }
 .onb-step{display:none;flex-direction:column;flex:1;animation:onbIn .35s cubic-bezier(.22,1,.36,1)}
 .onb-step.active{display:flex}
-@keyframes onbIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.onb-question{font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:1.2;margin-bottom:10px}
+@keyframes onbIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.onb-question{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.2;margin-bottom:10px}
 .onb-hint{font-size:14px;color:var(--text-dim);line-height:1.5;margin-bottom:28px}
 .onb-input{
   width:100%;padding:18px 20px;border-radius:var(--r-md);
-  background:var(--surface-2);border:1.5px solid transparent;
+  background:var(--input-bg);border:1.5px solid transparent;
   font-size:17px;color:var(--text);font-weight:500;
   transition:border-color var(--t),background var(--t);
 }
-.onb-input:focus{border-color:var(--blue-500);background:var(--surface)}
+.onb-input:focus{border-color:var(--blue-500);background:var(--bg)}
 .onb-input::placeholder{color:var(--text-mute);font-weight:400}
 .onb-error{color:var(--danger);font-size:13px;margin-top:12px;font-weight:500;min-height:18px}
 .onb-spacer{flex:1;min-height:24px}
@@ -171,32 +257,25 @@ a{color:var(--blue-500);text-decoration:none}
 .home-greet{flex:1;min-width:0}
 .home-greet small{color:var(--text-dim);font-size:13px}
 .home-greet h2{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;position:relative;transition:background var(--t)}
+.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;position:relative}
 .icon-btn:active{background:var(--surface-2)}
 .icon-btn svg{width:20px;height:20px;color:var(--text)}
 .icon-btn .dot{position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--blue-500);border:2px solid var(--surface)}
 
-/* Balance card - navy premium */
+/* Balance card */
 .balance-card{
   margin:4px 20px 0;padding:24px;border-radius:var(--r-lg);
   background:linear-gradient(135deg,var(--card-grad-a) 0%,var(--card-grad-b) 100%);
   color:#fff;position:relative;overflow:hidden;
   box-shadow:0 12px 32px rgba(10,37,64,.25);
 }
-.balance-card::before{content:"";position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.25),transparent 70%)}
-.bc-label{font-size:13px;opacity:.72;letter-spacing:.2px;font-weight:500;position:relative;z-index:1}
+.balance-card::before{content:"";position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.2),transparent 70%)}
+.bc-label{font-size:13px;opacity:.7;letter-spacing:.2px;font-weight:500;position:relative;z-index:1}
 .bc-eye{position:absolute;top:22px;right:22px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;z-index:2}
 .bc-eye svg{width:18px;height:18px;color:#fff}
-.bc-amount{
-  font-size:38px;font-weight:800;letter-spacing:-1.2px;
-  margin-top:8px;position:relative;z-index:1;line-height:1.1;
-  transition:filter .25s;
-}
+.bc-amount{font-size:38px;font-weight:800;letter-spacing:-1.2px;margin-top:8px;position:relative;z-index:1;line-height:1.1;transition:filter .25s}
 .bc-amount.hidden{filter:blur(12px)}
-.bc-bottom{
-  display:flex;gap:28px;margin-top:20px;position:relative;z-index:1;
-  padding-top:16px;border-top:1px solid rgba(255,255,255,.1);
-}
+.bc-bottom{display:flex;gap:28px;margin-top:20px;position:relative;z-index:1;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
 .bc-bottom div small{display:block;font-size:11px;opacity:.6;letter-spacing:.3px;font-weight:500}
 .bc-bottom div strong{font-size:14px;font-weight:700;margin-top:4px;display:block}
 
@@ -204,12 +283,7 @@ a{color:var(--blue-500);text-decoration:none}
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 20px 0}
 .qa{display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform var(--t)}
 .qa:active{transform:scale(.94)}
-.qa-ico{
-  width:52px;height:52px;border-radius:14px;
-  background:var(--surface);border:1px solid var(--border);
-  display:grid;place-items:center;
-  box-shadow:var(--shadow);
-}
+.qa-ico{width:52px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:var(--shadow)}
 .qa-ico svg{width:22px;height:22px;color:var(--navy-700)}
 [data-theme="dark"] .qa-ico svg{color:var(--blue-300)}
 .qa span{font-size:11.5px;font-weight:600;color:var(--text-dim);text-align:center;line-height:1.2}
@@ -226,7 +300,7 @@ a{color:var(--blue-500);text-decoration:none}
   background:linear-gradient(135deg,var(--navy-700) 0%,var(--navy-600) 60%,var(--navy-500) 100%);
   position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.2);
 }
-.card-preview::before{content:"";position:absolute;top:-100px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.3),transparent 70%)}
+.card-preview::before{content:"";position:absolute;top:-100px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.25),transparent 70%)}
 .cp-brand{font-size:15px;font-weight:800;letter-spacing:-.3px;position:relative;z-index:1}
 .cp-chip{position:absolute;top:18px;right:20px;width:36px;height:26px;border-radius:5px;background:linear-gradient(135deg,#E8C87A,#B8923D);position:relative;z-index:1}
 .cp-num{font-family:ui-monospace,Menlo,monospace;font-size:16px;letter-spacing:2px;margin-top:26px;position:relative;z-index:1;font-weight:500}
@@ -246,11 +320,7 @@ a{color:var(--blue-500);text-decoration:none}
 
 /* Transaction item */
 .tx-list{display:flex;flex-direction:column;gap:4px}
-.tx{
-  display:flex;align-items:center;gap:14px;padding:14px 4px;
-  border-bottom:1px solid var(--border);
-  transition:background var(--t);
-}
+.tx{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--border);transition:background var(--t)}
 .tx:last-child{border-bottom:none}
 .tx:active{background:var(--surface-2)}
 .tx-ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:var(--surface-2)}
@@ -297,11 +367,7 @@ a{color:var(--blue-500);text-decoration:none}
 .switch.on::after{transform:translateX(20px)}
 
 /* Pix */
-.pix-hero{
-  border-radius:var(--r-lg);padding:24px;color:#fff;margin-top:20px;
-  background:linear-gradient(135deg,var(--navy-700),var(--navy-500));
-  position:relative;overflow:hidden;
-}
+.pix-hero{border-radius:var(--r-lg);padding:24px;color:#fff;margin-top:20px;background:linear-gradient(135deg,var(--navy-700),var(--navy-500));position:relative;overflow:hidden}
 .pix-hero::before{content:"";position:absolute;top:-60px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(59,124,255,.25),transparent 70%)}
 .pix-hero h3{font-size:18px;font-weight:700;letter-spacing:-.3px;position:relative;z-index:1}
 .pix-hero p{font-size:13.5px;opacity:.75;margin-top:6px;position:relative;z-index:1;line-height:1.4}
@@ -365,7 +431,7 @@ a{color:var(--blue-500);text-decoration:none}
 /* Modal */
 .modal-overlay{position:absolute;inset:0;background:rgba(4,16,31,.55);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .modal-overlay.show{display:flex;animation:fadeIn .2s}
-.modal{width:100%;max-width:480px;background:var(--surface);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + var(--safe-b));transform:translateY(100%);animation:slideUp .32s cubic-bezier(.22,1,.36,1) forwards;max-height:85%;overflow-y:auto}
+.modal{width:100%;max-width:480px;background:var(--bg);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + var(--safe-b));transform:translateY(100%);animation:slideUp .32s cubic-bezier(.22,1,.36,1) forwards;max-height:85%;overflow-y:auto}
 .modal h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
 .modal p{font-size:14px;color:var(--text-dim);margin-bottom:18px;line-height:1.5}
 .modal .btn{margin-top:8px}
@@ -404,30 +470,67 @@ a{color:var(--blue-500);text-decoration:none}
     <div class="splash-loader"></div>
   </div>
 
-  <!-- ============ LOGIN ============ -->
+  <!-- ============ LOGIN PREMIUM ============ -->
   <div class="screen scroll" id="scr-login">
-    <div class="auth">
-      <div class="auth-top">
-        <div class="auth-logo">
+    <div class="login-wrap">
+      <div class="login-header">
+        <div class="login-logo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
         </div>
-        <h1 class="auth-title">Bem-vindo de volta</h1>
-        <p class="auth-sub">Entre na sua conta para continuar</p>
+        <h1 class="login-title">Bem-vindo de volta</h1>
+        <p class="login-sub">Acesse sua conta Nexo com segurança</p>
       </div>
-      <div class="auth-form">
-        <div class="field">
-          <label>E-mail ou CPF</label>
-          <input id="login-user" type="text" placeholder="voce@email.com" autocomplete="username" />
-        </div>
-        <div class="field">
-          <label>Senha</label>
-          <input id="login-pass" type="password" placeholder="Sua senha" autocomplete="current-password" />
-        </div>
-        <div class="err" id="login-err"></div>
-        <button class="btn btn-primary" id="btn-login" style="margin-top:8px">Entrar</button>
+
+      <!-- Seletor CPF / E-mail -->
+      <div class="login-tabs" id="login-tabs">
+        <button class="login-tab active" data-method="cpf">CPF</button>
+        <button class="login-tab" data-method="email">E-mail</button>
       </div>
-      <div class="auth-bottom">Não tem conta? <a href="#" id="go-register">Criar agora</a></div>
-      <div class="auth-terms">Ao continuar você aceita nossos<br><a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></div>
+
+      <!-- Campo dinâmico -->
+      <div class="login-field">
+        <label id="login-label">CPF</label>
+        <div class="login-input-wrap">
+          <input class="login-input" id="login-identifier" type="text" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="username" />
+        </div>
+      </div>
+
+      <div class="login-field">
+        <label>Senha</label>
+        <div class="login-input-wrap">
+          <input class="login-input" id="login-pass" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
+          <button class="login-eye" id="toggle-pass" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="login-aux">
+        <a href="#" id="forgot-pass">Esqueci minha senha</a>
+      </div>
+
+      <div class="err" id="login-err"></div>
+
+      <button class="login-btn" id="btn-login">Entrar</button>
+
+      <div class="login-divider">ou acesse com</div>
+
+      <div class="login-alt">
+        <button class="alt-btn" id="btn-biometric">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"/><path d="M6 12a6 6 0 0 1 12 0v2a6 6 0 0 1-12 0v-2z"/><path d="M3 12a9 9 0 0 1 18 0v2a9 9 0 0 1-18 0v-2z"/></svg>
+          Entrar com biometria
+        </button>
+      </div>
+
+      <div class="login-footer">
+        <div class="create-account">
+          Ainda não tem conta? <a href="#" id="go-register">Abra sua conta</a>
+        </div>
+        <div class="login-terms">
+          Ao continuar você aceita nossos<br>
+          <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -739,7 +842,7 @@ a{color:var(--blue-500);text-decoration:none}
 
 const CONFIG = {
   API_BASE: '',        // ex: 'https://sua-api.onrender.com'
-  DEMO_MODE: true,     // false quando o backend do Módulo 2 estiver pronto
+  DEMO_MODE: true,
   TIMEOUT: 8000
 };
 
@@ -803,6 +906,7 @@ const state = {
   showBalance: false, showCardData: false,
   theme: localStorage.getItem('nexo-theme') || 'light',
   activeTab: 'home', filter: 'all', cardBlocked: false,
+  loginMethod: 'cpf',
   onb: { step: 1, data: {} }
 };
 
@@ -846,7 +950,7 @@ function applyTheme() {
   document.documentElement.setAttribute('data-theme', real);
   const lbl = { auto:'Automático', dark:'Escuro', light:'Claro' }[pref];
   if ($('#theme-label')) $('#theme-label').textContent = lbl;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', real === 'dark' ? '#04101F' : '#F5F7FA');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', real === 'dark' ? '#04101F' : '#FFFFFF');
 }
 function cycleTheme() {
   const order = ['light','dark','auto'];
@@ -871,9 +975,108 @@ function calcAge(dateStr) {
   return age;
 }
 
+/* ============ LOGIN: Seletor CPF / E-mail ============ */
+function setLoginMethod(method) {
+  state.loginMethod = method;
+  $$('.login-tab').forEach(t => t.classList.toggle('active', t.dataset.method === method));
+  const label = $('#login-label');
+  const input = $('#login-identifier');
+  if (method === 'cpf') {
+    label.textContent = 'CPF';
+    input.placeholder = '000.000.000-00';
+    input.maxLength = 14;
+    input.inputMode = 'numeric';
+    input.value = '';
+  } else {
+    label.textContent = 'E-mail';
+    input.placeholder = 'voce@email.com';
+    input.maxLength = 60;
+    input.inputMode = 'email';
+    input.value = '';
+  }
+}
+
+function bindLogin() {
+  $$('.login-tab').forEach(t => t.onclick = () => setLoginMethod(t.dataset.method));
+
+  // Máscara de CPF
+  $('#login-identifier').addEventListener('input', e => {
+    if (state.loginMethod !== 'cpf') return;
+    let v = e.target.value.replace(/\D/g,'').slice(0,11);
+    v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    e.target.value = v;
+  });
+
+  // Mostrar/ocultar senha
+  $('#toggle-pass').onclick = () => {
+    const p = $('#login-pass');
+    p.type = p.type === 'password' ? 'text' : 'password';
+  };
+
+  $('#btn-login').onclick = doLogin;
+  $('#login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  $('#forgot-pass').onclick = e => {
+    e.preventDefault();
+    showToast('Link de recuperação enviado (simulação)');
+  };
+
+  $('#btn-biometric').onclick = () => {
+    showToast('Autenticação biométrica (simulação)');
+  };
+
+  $('#go-register').onclick = e => {
+    e.preventDefault();
+    state.onb = { step: 1, data: {} };
+    showScreen('scr-onboarding');
+    renderOnbStep();
+  };
+}
+
+async function doLogin() {
+  const identifier = $('#login-identifier').value.trim();
+  const pass = $('#login-pass').value;
+  const err = $('#login-err');
+  err.classList.remove('show');
+
+  if (!identifier || !pass) {
+    err.textContent = 'Preencha todos os campos.';
+    err.classList.add('show'); return;
+  }
+
+  if (state.loginMethod === 'cpf' && identifier.replace(/\D/g,'').length !== 11) {
+    err.textContent = 'CPF inválido. Digite os 11 dígitos.';
+    err.classList.add('show'); return;
+  }
+
+  const btn = $('#btn-login');
+  btn.disabled = true; btn.textContent = 'Entrando…';
+
+  try {
+    let data;
+    if (CONFIG.DEMO_MODE) {
+      await new Promise(r => setTimeout(r, 700));
+      data = { user: DEMO.user, token: 'demo-token' };
+    } else {
+      data = await API.login({ identifier, password: pass, method: state.loginMethod });
+      API.token = data.token;
+    }
+    state.user = data.user;
+    await loadAppData();
+    showScreen('scr-app');
+    renderAll();
+    bindApp();
+  } catch (e) {
+    err.textContent = 'Não foi possível entrar. Verifique os dados.';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
 /* ============ ONBOARDING WIZARD ============ */
 const ONB_STEPS = [
-  { key:'name', title:'Qual é o seu nome completo?', hint:'Como aparece no seu documento de identidade.', type:'text', placeholder:'Digite seu nome completo', autofocus:true,
+  { key:'name', title:'Qual é o seu nome completo?', hint:'Como aparece no seu documento de identidade.', type:'text', placeholder:'Digite seu nome completo',
     validate: v => v.trim().split(/\s+/).length >= 2 || 'Informe nome e sobrenome.' },
   { key:'cpf', title:'Qual é o seu CPF?', hint:'Usamos para verificar sua identidade com segurança.', type:'text', placeholder:'000.000.000-00', maxLength:14, mask:'cpf',
     validate: v => v.replace(/\D/g,'').length === 11 || 'CPF deve ter 11 dígitos.' },
@@ -916,7 +1119,6 @@ function renderOnbStep() {
   const input = $('#onb-input');
   const err = $('#onb-error');
 
-  // Máscaras
   if (step.mask === 'cpf') {
     input.addEventListener('input', e => {
       let v = e.target.value.replace(/\D/g,'').slice(0,11);
@@ -990,43 +1192,6 @@ function onbBack() {
     renderOnbStep();
   } else {
     showScreen('scr-login');
-  }
-}
-
-/* ============ AUTH ============ */
-async function doLogin() {
-  const user = $('#login-user').value.trim();
-  const pass = $('#login-pass').value;
-  const err = $('#login-err');
-  err.classList.remove('show');
-
-  if (!user || !pass) {
-    err.textContent = 'Preencha todos os campos.';
-    err.classList.add('show'); return;
-  }
-
-  const btn = $('#btn-login');
-  btn.disabled = true; btn.textContent = 'Entrando…';
-
-  try {
-    let data;
-    if (CONFIG.DEMO_MODE) {
-      await new Promise(r => setTimeout(r, 700));
-      data = { user: DEMO.user, token: 'demo-token' };
-    } else {
-      data = await API.login({ user, password: pass });
-      API.token = data.token;
-    }
-    state.user = data.user;
-    await loadAppData();
-    showScreen('scr-app');
-    renderAll();
-    bindApp();
-  } catch (e) {
-    err.textContent = 'Não foi possível entrar. Verifique os dados.';
-    err.classList.add('show');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Entrar';
   }
 }
 
@@ -1110,9 +1275,7 @@ function renderCards() {
   $('#tab-card-num').textContent = `•••• •••• •••• ${c.last4}`;
   $('#tab-card-exp').textContent = state.showCardData ? c.exp : '••/••';
   $('#tab-card-cvv').textContent = state.showCardData ? c.cvv : '•••';
-  const cardTx = state.transactions.filter(t =>
-    /compra|recarga/i.test(t.title)
-  );
+  const cardTx = state.transactions.filter(t => /compra|recarga/i.test(t.title));
   $('#card-tx').innerHTML = cardTx.map(txHTML).join('') ||
     '<p style="color:var(--text-dim);font-size:13px;padding:12px 0">Nenhuma compra recente.</p>';
 }
@@ -1275,21 +1438,10 @@ async function boot() {
     if (state.theme === 'auto') applyTheme();
   });
 
-  // Splash
-  await new Promise(r => setTimeout(r, 1500));
+  await new Promise(r => setTimeout(r, 1400));
   showScreen('scr-login');
+  bindLogin();
 
-  // Login
-  $('#go-register').onclick = e => {
-    e.preventDefault();
-    state.onb = { step: 1, data: {} };
-    showScreen('scr-onboarding');
-    renderOnbStep();
-  };
-  $('#btn-login').onclick = doLogin;
-  $('#login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
-  // Onboarding back
   $('#onb-back').onclick = onbBack;
 }
 
